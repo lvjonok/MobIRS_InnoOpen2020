@@ -6,28 +6,28 @@
         <balls/>
         <colorFields/>
         <images>
-            <image isBackground="false" imageId="{d7c58b96-9705-430f-8595-969113e96f0b}" position="-3.55556:0.444444" rect="-231:-173:912:591" id="{9d2a6000-2a41-41a6-a491-ad56d93f2e28}"/>
+            <image isBackground="false" rect="-231:-173:912:591" position="0:0" imageId="{d7c58b96-9705-430f-8595-969113e96f0b}" id="{9d2a6000-2a41-41a6-a491-ad56d93f2e28}"/>
         </images>
         <regions/>
     </world>
     <robots>
-        <robot direction="0" position="248:-98" id="trikKitRobot">
+        <robot direction="-3.784" position="274.748:-96.326" id="trikKitRobot">
             <sensors>
-                <sensor direction="0" position="33:-16" type="trik::robotModel::parts::TrikLightSensor" port="A5###input###А5###sensorA5"/>
-                <sensor direction="0" position="32:59" type="trik::robotModel::parts::TrikLightSensor" port="A6###input###А6###sensorA6"/>
-                <sensor direction="0" position="75:3" type="trik::robotModel::parts::TrikLightSensor" port="A3###input###А3###sensorA3"/>
-                <sensor direction="0" position="75:45" type="trik::robotModel::parts::TrikLightSensor" port="A4###input###А4###sensorA4"/>
-                <sensor direction="0" position="60.7913:15.9306" type="trik::robotModel::parts::TrikLightSensor" port="A1###input###А1###sensorA1"/>
-                <sensor direction="0" position="60.6977:31.0931" type="trik::robotModel::parts::TrikLightSensor" port="A2###input###А2###sensorA2"/>
+                <sensor port="A3###input###А3###sensorA3" direction="0" position="75:3" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor port="A4###input###А4###sensorA4" direction="0" position="75.6618:47.3842" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor port="A1###input###А1###sensorA1" direction="0" position="61:17" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor port="A2###input###А2###sensorA2" direction="0" position="61:32" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor port="A5###input###А5###sensorA5" direction="0" position="33:-16" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor port="A6###input###А6###sensorA6" direction="0" position="32:59" type="trik::robotModel::parts::TrikLightSensor"/>
             </sensors>
-            <startPosition direction="0" x="273" y="-73" id="{cf26c352-741a-4755-a55f-3edafcacd006}"/>
+            <startPosition y="-73" x="273" direction="0" id="{7ea99934-947f-4808-b6f2-ece7310732a5}"/>
             <wheels left="M4###output###М4###" right="M3###output###М3###"/>
         </robot>
     </robots>
-    <settings realisticSensors="false" realisticMotors="false" realisticPhysics="false"/>
+    <settings realisticPhysics="false" realisticMotors="false" realisticSensors="false"/>
     <blobs>
         <images>
-            <image path="C:/TRIKStudioLAST/images/fields/Inverse_line.svg" imageId="{d7c58b96-9705-430f-8595-969113e96f0b}" external="false">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>&#xd;
+            <image imageId="{d7c58b96-9705-430f-8595-969113e96f0b}" external="false" path="C:/TRIKStudioLAST/images/fields/Inverse_line.svg">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?>&#xd;
 &lt;!-- Created with Inkscape (http://www.inkscape.org/) -->&#xd;
 &#xd;
 &lt;svg&#xd;

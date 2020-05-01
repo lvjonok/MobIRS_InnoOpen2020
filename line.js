@@ -1,1 +1,1 @@
-include('D://programs//IRS_projects//InnopolisOpen//main.js')
+include('D://programs//IRS_projects//MobIRS_InnoOpen2020//main.js')
