@@ -1,16 +1,16 @@
 Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSideSensor, rightSideSensor, middleLineSensor){
-	this.motorLeft = brick.motor(leftMotor);
-	this.motorRight = brick.motor(rightMotor);
-	this.encoderLeft = brick.encoder("E" + leftMotor[1]);
-	this.encoderRight = brick.encoder("E" + rightMotor[1]);
-	this.llS = brick.sensor(leftLineSensor).read;
-	this.rlS = brick.sensor(rightLineSensor).read;
-	this.lsS = brick.sensor(leftSideSensor).read;
-	this.rsS = brick.sensor(rightSideSensor).read;
-	this.mlS = brick.sensor(middleLineSensor).read;
-	this.sensors = [this.lsS, this.llS, this.mlS, this.rlS, this.rsS];
-	this.track_sm = 17.5;
-	this.wheelD_sm = 5.6;
+	this.motorLeft = brick.motor(leftMotor);									// robot's left motor object
+	this.motorRight = brick.motor(rightMotor);									// robot's right motor object
+	this.encoderLeft = brick.encoder("E" + leftMotor[1]);						// robot's left encoder object
+	this.encoderRight = brick.encoder("E" + rightMotor[1]);						// robot's right encoder object
+	this.llS = brick.sensor(leftLineSensor).read;								// robot's left line sensor object
+	this.rlS = brick.sensor(rightLineSensor).read;								// robot's right line sensor object
+	this.lsS = brick.sensor(leftSideSensor).read;								// robot's left side sensor object
+	this.rsS = brick.sensor(rightSideSensor).read;								// robot's right side sensor object
+	this.mlS = brick.sensor(middleLineSensor).read;								// robot's middle line sensor object
+	this.sensors = [this.lsS, this.llS, this.mlS, this.rlS, this.rsS];			// containter for sensor objects
+	this.track_sm = 17.5;														// robot's track length
+	this.wheelD_sm = 5.6;														// robot's wheel diameter
 	this.resetEncoders = function(){
 		this.encoderLeft.reset();
 		this.encoderRight.reset();
@@ -240,32 +240,38 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		smartPrint(output);
 		return output;
 	};
-	this.getCellMap = function(){
+	this.getCellMap = function(){										// returns array with 4 elements: 1 - way exists, -1 - no way
 		var map = [];
+		var surface = this.sensors[0]() < 50 ? 1 : -1;	// surface color: 1 - white, -1 - black
 		for (var i = 0; i < 4; i++){
-			map.push(this.sensors[2]() < 50 ? 0 : 1);
+			var middle_value = this.sensors[2]() < 50 ? 1 : -1;	// middle sensor color: 1 - white, -1 - black
+			if (middle_value == 1){
+				map.push(surface == 1 ? -1 : 1);
+			} else if (middle_value == -1){
+				map.push(surface == 1 ? 1 : -1);
+			}
 			robot.turnDegrees(90);
 		}
 		return map;
-	}
+	};
 };
 
 Field = function(robot){
-	this.direction = 1;
-	this.map = [];
-	this.height = 6;
-	this.width = 6;
-	this.x = -1;
-	this.y = -1;
-	this.direction = 1;
-	this.localization_map = [];
-	this.localization_height = 20;
-	this.localization_width = 20;
-	this.localization_x = 10;
-	this.localization_y = 10;
+	this.robot = robot;							// link to our robot
+	this.map = [];								// real map
+	this.height = 6;							// real map y height
+	this.width = 6;								// real map x width
+	this.x = -1;								// real robot x coordinate
+	this.y = -1;								// real robot y coordinate
+	this.direction = 1;							// real robot direction
+	this.localization_map = [];					// virtual map
+	this.localization_height = 20;				// virtual map y height
+	this.localization_width = 20;				// virtual map x width
+	this.localization_x = 10;					// virtual robot x coordinate
+	this.localization_y = 10;					// virtual robot y coordinate
 	this.generateMap(field.map, 6, 6);
 	this.generateMap(field.localization_map, 20, 20);
-	this.generateMap = function(map, width, height){
+	this.generateMap = function(map, width, height){							// generates blank map with all roads
 		if (typeof(map) != "object") throw "ERROR this.generateMap = function(map, width, height){";
 		for (var vertex = 0; vertex < width * height; vertex++){
 			map.push([]);
@@ -275,7 +281,7 @@ Field = function(robot){
 			// print(vertex, " ", map[vertex]);
 		}
 	};
-	this.getNextVertex = function(cur_v, dir, width, height){
+	this.getNextVertex = function(cur_v, dir, width, height){					// returns next vertex in custom map
 		switch (dir){
 			case 0:
 				cur_v -= width;
@@ -296,13 +302,109 @@ Field = function(robot){
 		if (cur_v >= 0 && cur_v < width * height) return cur_v;
 		return -1;
 	};
-	this.getVertexFromCoor = function(x, y){
-		return y * 6 + x;
+	this.getVertexFromCoor = function(x, y, width, height){						// converts coordinates to vertex
+		return y * width + x;
 	};
-	this.getCoorsFromVertex = function(vertex){
+	this.getCoorsFromVertex = function(vertex){									// converts vertex to coordinates
 		return [vertex - floor(vertex / 6) * 6, floor(vertex / 6)]
 	};
-}
+	this.localization = function(){												// localizes robot in map
+		var self = this;
+		var min_x = this.localization_x;
+		var max_x = min_x;
+		var min_y = this.localization_y;
+		var max_y = min_y;
+
+		function changeCoors(direction){
+			switch (direction){
+				case 0:
+					this.localization_y -= 1;
+					min_y = min(min_y, this.localization_y);
+				break;
+				case 1:
+					this.localization_x += 1;
+					max_x = max(max_x, this.localization_x);
+				break;
+				case 2:
+					this.localization_y += 1;
+					min_y = max(min_y, this.localization_y);
+				break;
+				case 3:
+					this.localization_x -= 1;
+					max_x = min(max_x, this.localization_x);
+				break;
+			}
+		};
+		function moveRobot(cur_v, last_v){
+			if (cur_v != last_v){
+				turn = self.getTurn(this.direction, self.localization_map[cur_v].indexOf(last_v));
+				switch (turn){
+					case 0:
+						var out = robot.driveSector();
+						this.direction += out['direction'];
+					break;
+					case 1:
+						this.direction += 1;
+						var out = robot.driveSector();
+						this.direction += out['direction'];
+					break;
+					case -1:
+						this.direction -= 1;
+						var out = robot.driveSector();
+						this.direction += out['direction'];
+					break;
+					case 2:
+						this.direction += 2;
+						var out = robot.driveSector();
+						this.direction += out['direction'];
+					break;
+				}
+				if (this.direction > 3) this.direction -= 4;
+				if (this.direction < 0) this.direction += 4;
+				changeCoors(this.direction);
+				return out;
+			}
+			return false;
+		};
+
+		var current_vertex = this.getVertexFromCoor(this.localization_x, this.localization_y, this.localization_width, this.localization_height);
+		var last_vertex = current_vertex;
+
+		var visited = [current_vertex];
+		var queue = [current_vertex];
+
+		while (true){
+			current_vertex = queue[queue.length - 1];
+			var moved = moveRobot(current_vertex, last_vertex);
+			if (!moved){
+				// we can take map after moving
+				var cell_map = moved['map'];
+			} else {
+				// we should turn around and read map
+				var cell_map = robot.getCellMap();
+			}
+			visited.push(current_vertex);
+
+		}
+
+	};
+	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
+		var turn_array = [[0,1,2,-1],[-1,0,1,2],[2,-1,0,1],[1,2,-1,0]];
+		return turn_array[s_d][e_d];
+	};
+	this.updateVertexAdjacency = function(vertex, direction, map, local_map){	// updates cell map vertex
+		for (var c_d_raw = direction; c_d_raw < direction + 4; c_d_raw++){
+			var c_d = c_d_raw > 4 ? c_d - 4 : c_d;
+			var r_d = c_d + 2;
+			r_d = r_d > 4 ? r_d - 4 : r_d;
+			if (local_map[c_d] == -1){
+				next_vertex = map[vertex][c_d];
+				if (next_vertex != -1) map[next_vertex][r_d] = -1;
+				map[vertex][c_d] = -1;
+			}
+		}
+	};
+};
 
 var smartPrint = function(obj){print(JSON.stringify(obj, null, 4));};
 var wait = script.wait;
