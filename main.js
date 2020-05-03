@@ -17,6 +17,14 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 	};
 	this.target_encoders = {'left' : 0, 'right' : 0};
 	this.resetEncoders();
+	this.sm2cpr = function(sm){
+		return sm / (this.wheelD_sm * Math.PI) * 360;
+	};
+	this.sign = function(number){
+		if (number > 0) return 1;
+		if (number < 0) return -1;
+		return 0;
+	}
 	this.moveEncoders = function(enc, speed){
 		// var seL = this.encoderLeft.read();
 		// var seR = this.encoderRight.read();
@@ -42,7 +50,29 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		this.setSpeed(0, 0);
 	};
 	this.turnDegrees = function(degrees){
-		// var enc = 
+		var const_enc = this.sm2cpr(this.track_sm * Math.PI * (degrees / 360));
+		var direction = this.sign(const_enc);
+		print(const_enc);
+		print(direction);
+		this.target_encoders['left'] += const_enc;
+		this.target_encoders['right'] -= const_enc;
+
+		var eL = this.encoderLeft.read();
+		var eR = this.encoderRight.read();
+		
+		while ((this.target_encoders['left'] > eL && this.target_encoders['right'] < eR && direction == 1) || (this.target_encoders['left'] < eL && this.target_encoders['right'] > eR && direction == -1)){
+			eL = this.encoderLeft.read();
+			eR = this.encoderRight.read();
+			this.setSpeed(80 * direction, -80 * direction);
+		}
+		var st = Date.now();
+		while (Date.now() - st < 500){
+			var eL = this.encoderLeft.read();
+			var eR = this.encoderRight.read();
+			this.setSpeed((this.target_encoders['left'] - eL) * 1.4, (this.target_encoders['right'] - eR) * 1.4);
+		}
+		this.setSpeed(0, 0);
+
 	}
 	this.setSpeed = function(lS, rS){
 		if (rS == undefined) rS = lS;
@@ -103,23 +133,26 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var surface_color = [undefined, undefined, undefined, undefined, undefined];
 		var surface_history = [[],[],[],[],[]];
 
-		for (var i = 0; i < 5; i++){
-			var sens = this.sensors[i]()
-			surface_color[i] = sens < 50 ? 1 : -1;
-			surface_history[i].push(surface_color[i]);
-		}
+		
 
 		var ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
 		var lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
+
+		for (var i = 0; i < 5; i++){
+			var sens = this.sensors[i]()
+			surface_color[i] = sens < 50 ? 1 : -1;
+			surface_history[i].push([surface_color[i], ll]);
+		}
+
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
 				if (sens < 50 && surface_color[i] == -1){
 					surface_color[i] = 1;
-					surface_history[i].push(surface_color[i]);
+					surface_history[i].push([surface_color[i], ll]);
 				} else if (sens > 50 && surface_color[i] == 1) {
 					surface_color[i] = -1;
-					surface_history[i].push(surface_color[i]);
+					surface_history[i].push([surface_color[i], ll]);
 				}
 			}
 
@@ -146,6 +179,7 @@ var min = Math.min;
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 
+	// robot.turnDegrees(90);
 	robot.driveSector();
 }
 
