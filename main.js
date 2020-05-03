@@ -15,12 +15,16 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		this.encoderLeft.reset();
 		this.encoderRight.reset();
 	};
+	this.target_encoders = {'left' : 0, 'right' : 0};
 	this.resetEncoders();
 	this.moveEncoders = function(enc, speed){
-		var seL = this.encoderLeft.read();
-		var seR = this.encoderRight.read();
-		var tL = seL + enc;
-		var tR = seR + enc;
+		// var seL = this.encoderLeft.read();
+		// var seR = this.encoderRight.read();
+		var tL = this.target_encoders['left'] + enc;
+		var tR = this.target_encoders['right'] + enc;
+
+		this.target_encoders['left'] += enc;
+		this.target_encoders['right'] += enc;
 		
 		var eL = this.encoderLeft.read();
 		var eR = this.encoderRight.read();
@@ -37,6 +41,9 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		}
 		this.setSpeed(0, 0);
 	};
+	this.turnDegrees = function(degrees){
+		// var enc = 
+	}
 	this.setSpeed = function(lS, rS){
 		if (rS == undefined) rS = lS;
 		this.motorLeft.setPower(lS);
@@ -85,10 +92,13 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 				1 - way available
 				-1 - no way
 		*/
-		var seL = this.encoderLeft.read();
-		var seR = this.encoderRight.read();
-		var teL = seL + const_enc;
-		var teR = seR + const_enc;
+		// var seL = this.encoderLeft.read();
+		// var seR = this.encoderRight.read();
+		var teL = this.target_encoders['left'] + const_enc;
+		var teR = this.target_encoders['right'] + const_enc;
+
+		this.target_encoders['left'] += const_enc;
+		this.target_encoders['right'] += const_enc;
 
 		var surface_color = [undefined, undefined, undefined, undefined, undefined];
 		var surface_history = [[],[],[],[],[]];
@@ -99,87 +109,25 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			surface_history[i].push(surface_color[i]);
 		}
 
-		var llS = this.llS();
-		var rlS = this.rlS();
-		var lsS = this.lsS();
-		var rsS = this.rsS();
-		
-		var last_lsS = lsS;
-		var last_rsS = rsS;
-
-		var surface_left_color = lsS < 50 ? 1 : -1; // 1 - white, -1 - black
-		var surface_left_history = [surface_left_color];
-
-		var surface_right_color = rsS < 50 ? 1 : -1;
-		var surface_right_history = [surface_right_color];
-
-		var surface_left_in_color = llS < 50 ? 1 : -1;
-		var surface_left_in_history = [surface_left_in_color];
-
-		var surface_right_in_color = rlS < 50 ? 1 : -1;
-		var surface_right_in_history = [surface_right_in_color];
-
-		var ll = this.encoderLeft.read() - seL;
-		var lr = this.encoderRight.read() - seR;
-		while (ll < const_enc || eR - seR < const_enc){
-			var llS = this.llS();
-			var rlS = this.rlS();
-			var lsS = this.lsS();
-			var rsS = this.rsS();
-			var lSurfaceS = this.lSurfaceS();
-			var rSurfaceS = this.rSurfaceS();
-
+		var ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
+		var lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
+		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
-				
+				if (sens < 50 && surface_color[i] == -1){
+					surface_color[i] = 1;
+					surface_history[i].push(surface_color[i]);
+				} else if (sens > 50 && surface_color[i] == 1) {
+					surface_color[i] = -1;
+					surface_history[i].push(surface_color[i]);
+				}
 			}
 
-
-			if (lsS < 50 && surface_left_color == -1){
-				surface_left_color = 1;
-				surface_left_history.push(surface_left_color);
-			} else if (lsS > 50 && surface_left_color == 1){
-				surface_left_color = -1;
-				surface_left_history.push(surface_left_color);
-			}
-
-			if (rsS < 50 && surface_right_color == -1){
-				surface_right_color = 1;
-				surface_right_history.push(surface_right_color);
-			} else if (rsS > 50 && surface_right_color == 1){
-				surface_right_color = -1;
-				surface_right_history.push(surface_right_color);
-			}
-
-			if (llS < 50 && surface_left_in_color == -1){
-				surface_left_in_color = 1;
-				surface_left_in_history.push(surface_left_in_color);
-			} else if (llS > 50 && surface_left_in_color == 1){
-				surface_left_in_color = -1;
-				surface_left_in_history.push(surface_left_in_color);
-			}
-
-			if (rlS < 50 && surface_right_in_color == -1){
-				surface_right_in_color = 1;
-				surface_right_in_history.push(surface_right_in_color);
-			} else if (rlS > 50 && surface_right_in_color == 1){
-				surface_right_in_color = -1;
-				surface_right_in_history.push(surface_right_in_color);
-			}
-
-			ll = this.encoderLeft.read() - seL;
-			lr = this.encoderRight.read() - seR;
+			ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
+			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 			this.setSpeed(speed - (ll - lr) * 2, speed + (ll - lr) * 2);
-			last_lsS = lsS;
-			last_rsS = rsS;
-			// wait(1);
 		}
-		surface_left_history.push(surface_left_color);
-		surface_right_history.push(surface_right_color);
-		print(surface_left_history);
-		print(surface_right_history);
-		print(surface_left_in_history);
-		print(surface_right_in_history);
+		print(surface_history);
 		var st = Date.now();
 		while (Date.now() - st < 250){
 			var eL = this.encoderLeft.read();
