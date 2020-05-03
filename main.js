@@ -94,9 +94,9 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			eL = this.encoderLeft.read();
 			eR = this.encoderRight.read();
 			if (direction == 1){
-				this.setSpeed(50, 0);
+				this.setSpeed(70, 0);
 			} else {
-				this.setSpeed(0, 50);
+				this.setSpeed(0, 70);
 			}
 		}
 		// this.setSpeed(0, 0);
@@ -151,7 +151,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		// var const_enc = 750; // encoders to reach next cell
 		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
 		var speed = 90;
-		var map = [undefined, undefined, 1, undefined]; // contains available movements in this cell, direction is regarding moving
+		var map = [undefined, undefined, 1, undefined]; // contains available movements in this cell, direction is regarding local start direction
 		/*
 			map descriptor:
 				1 - way available
@@ -182,12 +182,12 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
-				if ((sens < 50 && surface_color[i] == -1) || (sens > 50 && surface_color[i] == 1)){
+				if (((sens < 50 && surface_color[i] == -1) || (sens > 50 && surface_color[i] == 1)) && ll < 600){
 					surface_color[i] *= -1;
 					surface_history[i].push([surface_color[i], Math.round(ll)]);
 					if (i == 2 && ll > 120 && ll < 260) flr = true;
 					else if (i != 2 && flr == true){
-						print(surface_history[2]);
+						// print(surface_history[2]);
 						this.target_encoders['left'] = teL - 170;
 						this.target_encoders['right'] = teR - 170; // this.encoderRight.read();
 						var st = Date.now();
@@ -199,13 +199,18 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 						this.setSpeed(0, 0);
 						// robot.moveEncoders(305, 50);
 						if (i == 1){
+							output['movement'] = 'FL';
+							output['direction'] = -1;
 							output['map'][3] = 1;
 							robot.turnDegreesOneWheel(-90);
 						} else if (i == 3){
+							output['movement'] = 'FR';
+							output['direction'] = 1;
 							output['map'][1] = 1;
 							robot.turnDegreesOneWheel(90);
 						}						
 						robot.moveEncoders(-184, -30);
+						smartPrint(output);
 						return output;
 					}
 				}
@@ -215,7 +220,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 			this.setSpeed(speed - (ll - lr) * 2, speed + (ll - lr) * 2);
 		}
-		print(surface_history[2]);
+		// print(surface_history);
 		var st = Date.now();
 		while (Date.now() - st < 250){
 			var eL = this.encoderLeft.read();
@@ -223,10 +228,31 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			this.setSpeed((teL - eL) * 3, (teR - eR) * 3);
 		}
 		this.setSpeed(0, 0);
-		return {};
+
+		output['direction'] = 0;
+		output['movement'] = 'F';
+		var end_surface = surface_history[0][surface_history[0].length - 1][0];
+		if (end_surface != surface_history[2][surface_history[2].length - 1][0]){
+			output['map'][0] = 1;
+		} else {
+			output['map'][0] = 0;
+		}
+		if (surface_history[0].length > 2){
+			output['map'][3] = 1;
+		} else {
+			output['map'][3] = 0;
+		}
+		if (surface_history[4].length > 2){
+			output['map'][1] = 1;
+		} else {
+			output['map'][1] = 0;
+		}
+		smartPrint(output);
+		return output;
 	};
 };
 
+var smartPrint = function(obj){print(JSON.stringify(obj, null, 4));};
 var wait = script.wait;
 var abs = Math.abs;
 var max = Math.max;
@@ -237,6 +263,7 @@ var main = function(){
 
 	// robot.turnDegrees(90);
 	robot.driveSector();
+	
 	robot.turnDegrees(90);
 	robot.driveSector();
 	robot.turnDegrees(-90);
