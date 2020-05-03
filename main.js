@@ -252,8 +252,56 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 
 Field = function(robot){
 	this.direction = 1;
-	this.map = [[], [], [], [], [], []];
-	
+	this.map = [];
+	this.height = 6;
+	this.width = 6;
+	this.x = -1;
+	this.y = -1;
+	this.direction = 1;
+	this.localization_map = [];
+	this.localization_height = 20;
+	this.localization_width = 20;
+	this.localization_x = 10;
+	this.localization_y = 10;
+	this.generateMap(field.map, 6, 6);
+	this.generateMap(field.localization_map, 20, 20);
+	this.generateMap = function(map, width, height){
+		if (typeof(map) != "object") throw "ERROR this.generateMap = function(map, width, height){";
+		for (var vertex = 0; vertex < width * height; vertex++){
+			map.push([]);
+			for (var direction = 0; direction < 4; direction++){
+				map[vertex].push(this.getNextVertex(vertex, direction, width, height));
+			}
+			// print(vertex, " ", map[vertex]);
+		}
+	};
+	this.getNextVertex = function(cur_v, dir, width, height){
+		switch (dir){
+			case 0:
+				cur_v -= width;
+			break;
+			case 1:
+				cur_v += 1;
+			break;
+			case 2:
+				cur_v += width;
+			break;
+			case 3:
+				cur_v -= 1;
+			break;
+			default:
+				throw "bad direction";
+			break;
+		}
+		if (cur_v >= 0 && cur_v < width * height) return cur_v;
+		return -1;
+	};
+	this.getVertexFromCoor = function(x, y){
+		return y * 6 + x;
+	};
+	this.getCoorsFromVertex = function(vertex){
+		return [vertex - floor(vertex / 6) * 6, floor(vertex / 6)]
+	};
 }
 
 var smartPrint = function(obj){print(JSON.stringify(obj, null, 4));};
@@ -261,12 +309,14 @@ var wait = script.wait;
 var abs = Math.abs;
 var max = Math.max;
 var min = Math.min;
+var floor = Math.floor;
+var ceil = Math.ceil;
+var round = Math.round;
 
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
+	field = new Field(robot);
 
-	m = robot.getCellMap();
-	print(m);
 	return;
 
 	// robot.turnDegrees(90);
