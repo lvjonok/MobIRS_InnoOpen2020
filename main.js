@@ -1,16 +1,16 @@
 Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSideSensor, rightSideSensor, middleLineSensor){
-	this.motorLeft = brick.motor(leftMotor);									// robot's left motor object
-	this.motorRight = brick.motor(rightMotor);									// robot's right motor object
-	this.encoderLeft = brick.encoder("E" + leftMotor[1]);						// robot's left encoder object
-	this.encoderRight = brick.encoder("E" + rightMotor[1]);						// robot's right encoder object
-	this.llS = brick.sensor(leftLineSensor).read;								// robot's left line sensor object
-	this.rlS = brick.sensor(rightLineSensor).read;								// robot's right line sensor object
-	this.lsS = brick.sensor(leftSideSensor).read;								// robot's left side sensor object
-	this.rsS = brick.sensor(rightSideSensor).read;								// robot's right side sensor object
-	this.mlS = brick.sensor(middleLineSensor).read;								// robot's middle line sensor object
-	this.sensors = [this.lsS, this.llS, this.mlS, this.rlS, this.rsS];			// containter for sensor objects
-	this.track_sm = 17.5;														// robot's track length
-	this.wheelD_sm = 5.6;														// robot's wheel diameter
+	this.motorLeft = brick.motor(leftMotor);								// robot's left motor object
+	this.motorRight = brick.motor(rightMotor);								// robot's right motor object
+	this.encoderLeft = brick.encoder("E" + leftMotor[1]);					// robot's left encoder object
+	this.encoderRight = brick.encoder("E" + rightMotor[1]);					// robot's right encoder object
+	this.llS = brick.sensor(leftLineSensor).read;							// robot's left line sensor object
+	this.rlS = brick.sensor(rightLineSensor).read;							// robot's right line sensor object
+	this.lsS = brick.sensor(leftSideSensor).read;							// robot's left side sensor object
+	this.rsS = brick.sensor(rightSideSensor).read;							// robot's right side sensor object
+	this.mlS = brick.sensor(middleLineSensor).read;							// robot's middle line sensor object
+	this.sensors = [this.lsS, this.llS, this.mlS, this.rlS, this.rsS];		// containter for sensor objects
+	this.track_sm = 17.5;													// robot's track length
+	this.wheelD_sm = 5.6;													// robot's wheel diameter
 	this.resetEncoders = function(){
 		this.encoderLeft.reset();
 		this.encoderRight.reset();
@@ -45,7 +45,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		while (Date.now() - st < 250){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
-			this.setSpeed((tL - eL) * 1.4, (tR - eR) * 1.4);
+			this.setSpeed((tL - eL) * 5, (tR - eR) * 5);
 		}
 		this.setSpeed(0, 0);
 	};
@@ -148,8 +148,8 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 	this.driveSector = function(){
 		// var const_enc = 750; // encoders to reach next cell
 		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
-		var speed = 90;
-		var map = [0, 0, 1, 0]; // contains available movements in this cell, direction is regarding local start direction
+		var speed = 40;
+		var map = [-1, -1, 1, -1]; // contains available movements in this cell, direction is regarding local start direction
 		/*
 			map descriptor:
 				1 - way available
@@ -184,47 +184,47 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 					surface_history[i].push([surface_color[i], Math.round(ll)]);
 					if (i == 2 && ll > 100 && ll < 300) flr = true;
 					else if (i != 2 && flr == true){
-						var enc_less = this.sm2cpr(this.track_sm / 2);
+						var enc_less = floor(this.sm2cpr(this.track_sm / 2));
 						// smartPrint(surface_history);
 						this.target_encoders['left'] = teL - enc_less;
 						this.target_encoders['right'] = teR - enc_less; // this.encoderRight.read();
 						var st = Date.now();
-						while (Date.now() - st < 1000){
+						while (Date.now() - st < 2000){
 							var eL = this.encoderLeft.read();
 							var eR = this.encoderRight.read();
 							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
 						}
 						this.setSpeed(0, 0);
 						// robot.moveEncoders(305, 50);
-						if (i == 1){
+						if (i == 1){						// we detected left turn
 							output['movement'] = 'FL';
 							output['direction'] = -1;
-							output['map'][3] = 1;
+							output['map'] = [1, -1, -1, 1];
 							robot.turnDegreesOneWheel(-90);
-						} else if (i == 3){
+						} else if (i == 3){					// we detected right turn
 							output['movement'] = 'FR';
 							output['direction'] = 1;
-							output['map'][1] = 1;
+							output['map'] = [1, 1, -1, -1];
 							robot.turnDegreesOneWheel(90);
 						}						
-						robot.moveEncoders(-enc_less, -30);
-						smartPrint(output);
+						robot.moveEncoders(-enc_less, -20);
+						// smartPrint(output);
 						return output;
 					}
 				}
 			}
 			ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
 			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
-			this.setSpeed(speed - (ll - lr) * 2, speed + (ll - lr) * 2);
+			this.setSpeed(speed - (ll - lr) * 3, speed + (ll - lr) * 3);
 		}
 		var st = Date.now();
-		while (Date.now() - st < 250){
+		while (Date.now() - st < 750){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
-			this.setSpeed((teL - eL) * 3, (teR - eR) * 3);
+			this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
 		}
 		this.setSpeed(0, 0);
-		// print(surface_history[2]);
+		// smartPrint(surface_history);
 		output['direction'] = 0;
 		output['movement'] = 'F';
 		var end_surface = surface_history[0][surface_history[0].length - 1][0];
@@ -237,10 +237,10 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		if (surface_history[4].length > 2){
 			output['map'][1] = 1;
 		}
-		smartPrint(output);
+		// smartPrint(output);
 		return output;
 	};
-	this.getCellMap = function(){										// returns array with 4 elements: 1 - way exists, -1 - no way
+	this.getCellMap = function(){											// returns array with 4 elements: 1 - way exists, -1 - no way
 		var map = [];
 		var surface = this.sensors[0]() < 50 ? 1 : -1;	// surface color: 1 - white, -1 - black
 		for (var i = 0; i < 4; i++){
@@ -269,8 +269,31 @@ Field = function(robot){
 	this.localization_width = 20;				// virtual map x width
 	this.localization_x = 10;					// virtual robot x coordinate
 	this.localization_y = 10;					// virtual robot y coordinate
-	this.generateMap(field.map, 6, 6);
-	this.generateMap(field.localization_map, 20, 20);
+	this.getNextVertex = function(cur_v, dir, width, height){					// returns next vertex in custom map
+		switch (dir){
+			case 0:
+				cur_v -= width;
+			break;
+			case 1:
+				cur_v += 1;
+				if ( (cur_v < width * height) && (cur_v % width != 0) ) return cur_v;
+				else return -1;
+			break;
+			case 2:
+				cur_v += width;
+			break;
+			case 3:
+				cur_v -= 1;
+				if (cur_v >= 0 && cur_v % width != width - 1) return cur_v;
+				else return -1;
+			break;
+			default:
+				throw "bad direction";
+			break;
+		}
+		if (cur_v >= 0 && cur_v < width * height) return cur_v;
+		return -1;
+	};
 	this.generateMap = function(map, width, height){							// generates blank map with all roads
 		if (typeof(map) != "object") throw "ERROR this.generateMap = function(map, width, height){";
 		for (var vertex = 0; vertex < width * height; vertex++){
@@ -280,27 +303,6 @@ Field = function(robot){
 			}
 			// print(vertex, " ", map[vertex]);
 		}
-	};
-	this.getNextVertex = function(cur_v, dir, width, height){					// returns next vertex in custom map
-		switch (dir){
-			case 0:
-				cur_v -= width;
-			break;
-			case 1:
-				cur_v += 1;
-			break;
-			case 2:
-				cur_v += width;
-			break;
-			case 3:
-				cur_v -= 1;
-			break;
-			default:
-				throw "bad direction";
-			break;
-		}
-		if (cur_v >= 0 && cur_v < width * height) return cur_v;
-		return -1;
 	};
 	this.getVertexFromCoor = function(x, y, width, height){						// converts coordinates to vertex
 		return y * width + x;
@@ -314,6 +316,8 @@ Field = function(robot){
 		var max_x = min_x;
 		var min_y = this.localization_y;
 		var max_y = min_y;
+
+		var cv_directions = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]];
 
 		function changeCoors(direction){
 			switch (direction){
@@ -337,31 +341,35 @@ Field = function(robot){
 		};
 		function moveRobot(cur_v, last_v){
 			if (cur_v != last_v){
-				turn = self.getTurn(this.direction, self.localization_map[cur_v].indexOf(last_v));
+				print('moving from ', cur_v, ' ', last_v);
+				turn = self.getTurn(self.direction, self.localization_map[cur_v].indexOf(last_v));
 				switch (turn){
 					case 0:
-						var out = robot.driveSector();
-						this.direction += out['direction'];
+						var out = self.robot.driveSector();
+						self.direction += out['direction'];
 					break;
 					case 1:
-						this.direction += 1;
-						var out = robot.driveSector();
-						this.direction += out['direction'];
+						self.direction += 1;
+						self.robot.turnDegrees(90);
+						var out = self.robot.driveSector();
+						self.direction += out['direction'];
 					break;
 					case -1:
-						this.direction -= 1;
-						var out = robot.driveSector();
-						this.direction += out['direction'];
+						self.direction -= 1;
+						self.robot.turnDegrees(-90);
+						var out = self.robot.driveSector();
+						self.direction += out['direction'];
 					break;
 					case 2:
-						this.direction += 2;
-						var out = robot.driveSector();
-						this.direction += out['direction'];
+						self.direction += 2;
+						self.robot.turnDegrees(180);
+						var out = self.robot.driveSector();
+						self.direction += out['direction'];
 					break;
 				}
-				if (this.direction > 3) this.direction -= 4;
-				if (this.direction < 0) this.direction += 4;
-				changeCoors(this.direction);
+				if (self.direction > 3) self.direction -= 4;
+				if (self.direction < 0) self.direction += 4;
+				changeCoors(self.direction);
 				return out;
 			}
 			return false;
@@ -375,16 +383,34 @@ Field = function(robot){
 
 		while (true){
 			current_vertex = queue[queue.length - 1];
-			var moved = moveRobot(current_vertex, last_vertex);
-			if (!moved){
+			var moved = moveRobot(last_vertex, current_vertex);
+			print(queue);
+			print('moved');
+			smartPrint(moved);
+			if (moved){
 				// we can take map after moving
 				var cell_map = moved['map'];
 			} else {
 				// we should turn around and read map
-				var cell_map = robot.getCellMap();
+				// print('kek');
+				var cell_map = this.robot.getCellMap();
 			}
 			visited.push(current_vertex);
+			print('current map ', cell_map);
+			var av_v = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
+			for (var j = 0; j < av_v.length; j++){
+				if ( visited.indexOf(av_v[j]) == -1 ){
+					print('adding ', av_v[j]);
+					queue.push(av_v[j]);
+					break;
+				}
+			}
+			if (queue[queue.length - 1] == current_vertex){
+				from = queue.pop();
+			}
+			// bw();
 
+			last_vertex = current_vertex;
 		}
 
 	};
@@ -393,19 +419,39 @@ Field = function(robot){
 		return turn_array[s_d][e_d];
 	};
 	this.updateVertexAdjacency = function(vertex, direction, map, local_map){	// updates cell map vertex
+		var l_i = 0;
+		var available_vertices = [];
+		// print('update adjacency ', map[vertex], ' ', vertex);
 		for (var c_d_raw = direction; c_d_raw < direction + 4; c_d_raw++){
-			var c_d = c_d_raw > 4 ? c_d - 4 : c_d;
+			var c_d = c_d_raw > 3 ? c_d_raw - 4 : c_d_raw;
 			var r_d = c_d + 2;
-			r_d = r_d > 4 ? r_d - 4 : r_d;
-			if (local_map[c_d] == -1){
-				next_vertex = map[vertex][c_d];
+			print(c_d, ' ', local_map[l_i]);
+			r_d = r_d > 3 ? r_d - 4 : r_d;
+			next_vertex = map[vertex][	c_d];
+			if (local_map[l_i] == -1){		
+				// print('next vertex ', next_vertex);
 				if (next_vertex != -1) map[next_vertex][r_d] = -1;
 				map[vertex][c_d] = -1;
+			} else {
+				if (l_i != 2 || true){
+					available_vertices.push(next_vertex);
+					// print('added av ', c_d, ' ', next_vertex);
+				}
 			}
+			l_i += 1;
 		}
+		print('candidates for adding ', available_vertices);
+		// bw();
+		return available_vertices;
 	};
+	this.generateMap(this.map, 6, 6);
+	this.generateMap(this.localization_map, 20, 20);
 };
 
+var bw = function(){
+	brick.playTone(2000, 300);
+	while (!brick.keys().wasPressed(KeysEnum.Up)) { script.wait(100)}
+};
 var smartPrint = function(obj){print(JSON.stringify(obj, null, 4));};
 var wait = script.wait;
 var abs = Math.abs;
@@ -418,6 +464,7 @@ var round = Math.round;
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
+	field.localization();
 
 	return;
 
@@ -442,5 +489,4 @@ var main = function(){
 	robot.driveSector();
 	robot.turnDegrees(-90);
 };
-
 main();
