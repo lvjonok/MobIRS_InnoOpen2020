@@ -99,13 +99,11 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 				this.setSpeed(0, 70);
 			}
 		}
-		// this.setSpeed(0, 0);
-		// wait(3000);
 		var st = Date.now();
-		while (Date.now() - st < 500){
+		while (Date.now() - st < 400){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
-			this.setSpeed((this.target_encoders['left'] - eL) * 10, (this.target_encoders['right'] - eR) * 10);
+			this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
 		}
 		this.setSpeed(0, 0);
 	}
@@ -151,7 +149,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		// var const_enc = 750; // encoders to reach next cell
 		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
 		var speed = 90;
-		var map = [undefined, undefined, 1, undefined]; // contains available movements in this cell, direction is regarding local start direction
+		var map = [0, 0, 1, 0]; // contains available movements in this cell, direction is regarding local start direction
 		/*
 			map descriptor:
 				1 - way available
@@ -176,25 +174,25 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		}
 
 		var flr = false; // true - if we are passing round turn
-
 		var output = {'direction' : 0, 'map' : map, 'movement' : undefined};
 
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
-				if (((sens < 50 && surface_color[i] == -1) || (sens > 50 && surface_color[i] == 1)) && ll < 600){
+				if (((sens < 50 && surface_color[i] == -1) || (sens > 50 && surface_color[i] == 1)) && ll < 650){
 					surface_color[i] *= -1;
 					surface_history[i].push([surface_color[i], Math.round(ll)]);
-					if (i == 2 && ll > 120 && ll < 260) flr = true;
+					if (i == 2 && ll > 100 && ll < 300) flr = true;
 					else if (i != 2 && flr == true){
-						// print(surface_history[2]);
-						this.target_encoders['left'] = teL - 170;
-						this.target_encoders['right'] = teR - 170; // this.encoderRight.read();
+						var enc_less = this.sm2cpr(this.track_sm / 2);
+						// smartPrint(surface_history);
+						this.target_encoders['left'] = teL - enc_less;
+						this.target_encoders['right'] = teR - enc_less; // this.encoderRight.read();
 						var st = Date.now();
 						while (Date.now() - st < 1000){
 							var eL = this.encoderLeft.read();
 							var eR = this.encoderRight.read();
-							this.setSpeed((this.target_encoders['left'] - eL) * 8, (this.target_encoders['right'] - eR) * 8);
+							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
 						}
 						this.setSpeed(0, 0);
 						// robot.moveEncoders(305, 50);
@@ -209,18 +207,16 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 							output['map'][1] = 1;
 							robot.turnDegreesOneWheel(90);
 						}						
-						robot.moveEncoders(-184, -30);
+						robot.moveEncoders(-enc_less, -30);
 						smartPrint(output);
 						return output;
 					}
 				}
 			}
-
 			ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
 			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 			this.setSpeed(speed - (ll - lr) * 2, speed + (ll - lr) * 2);
 		}
-		// print(surface_history);
 		var st = Date.now();
 		while (Date.now() - st < 250){
 			var eL = this.encoderLeft.read();
@@ -228,29 +224,37 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			this.setSpeed((teL - eL) * 3, (teR - eR) * 3);
 		}
 		this.setSpeed(0, 0);
-
+		// print(surface_history[2]);
 		output['direction'] = 0;
 		output['movement'] = 'F';
 		var end_surface = surface_history[0][surface_history[0].length - 1][0];
 		if (end_surface != surface_history[2][surface_history[2].length - 1][0]){
 			output['map'][0] = 1;
-		} else {
-			output['map'][0] = 0;
 		}
 		if (surface_history[0].length > 2){
 			output['map'][3] = 1;
-		} else {
-			output['map'][3] = 0;
 		}
 		if (surface_history[4].length > 2){
 			output['map'][1] = 1;
-		} else {
-			output['map'][1] = 0;
 		}
 		smartPrint(output);
 		return output;
 	};
+	this.getCellMap = function(){
+		var map = [];
+		for (var i = 0; i < 4; i++){
+			map.push(this.sensors[2]() < 50 ? 0 : 1);
+			robot.turnDegrees(90);
+		}
+		return map;
+	}
 };
+
+Field = function(robot){
+	this.direction = 1;
+	this.map = [[], [], [], [], [], []];
+	
+}
 
 var smartPrint = function(obj){print(JSON.stringify(obj, null, 4));};
 var wait = script.wait;
@@ -260,6 +264,10 @@ var min = Math.min;
 
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
+
+	m = robot.getCellMap();
+	print(m);
+	return;
 
 	// robot.turnDegrees(90);
 	robot.driveSector();
@@ -280,6 +288,7 @@ var main = function(){
 	robot.driveSector();
 	robot.turnDegrees(-90);
 	robot.driveSector();
-}
+	robot.turnDegrees(-90);
+};
 
 main();
