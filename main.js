@@ -24,8 +24,14 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		if (number > 0) return 1;
 		if (number < 0) return -1;
 		return 0;
-	}
+	};
+	this.getSpeedSmooth = function(encDist, Dist, speed_start, speed_end){
+		/*
+		*/
+		return speed_start + (encDist / (Dist / (speed_end - speed_start) ) );
+	};
 	this.moveEncoders = function(enc, speed){
+		if (speed == undefined) speed = 0;
 		// var seL = this.encoderLeft.read();
 		// var seR = this.encoderRight.read();
 		var tL = this.target_encoders['left'] + enc;
@@ -36,13 +42,48 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		
 		var eL = this.encoderLeft.read();
 		var eR = this.encoderRight.read();
-		while ((tL > eL && tR > eR && enc > 0)||(tL < eL && tR < eR && enc < 0)){ // (eL - seL < enc || eR - seR < enc){
+
+		var acceleration_start = 0.05;
+		var acceleration_end = 0.95;
+
+		var eL = this.encoderLeft.read();
+		var eR = this.encoderRight.read();
+		var ll = abs(enc - tL + eL);
+		var rl = abs(enc - tR + eR);
+
+		var error = (ll - rl);
+		var last_error = error;
+
+		var kP = 2 * this.sign(enc);
+		var kD = 0;
+
+		while ((tL > eL && tR > eR && enc > 0)||(tL < eL && tR < eR && enc < 0)){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
-			this.setSpeed(speed, speed);
+			var ll = abs(enc - tL + eL);
+			var rl = abs(enc - tR + eR);
+			error = (ll - rl);
+			// print(ll, ' ', rl);
+			if (ll + rl < abs(enc) * 2 * acceleration_start){
+				// print('accelerating');
+				speed = this.getSpeedSmooth(ll, abs(enc) * acceleration_start, 5, 100);
+			} else if (ll + rl > abs(enc) * 2 * acceleration_end){
+				// print('slowing');
+				speed = this.getSpeedSmooth(ll - abs(enc) * acceleration_end, abs(enc) - abs(enc) * acceleration_end, 100, 10);
+			} else {
+				// print('const')
+				speed = 100;
+			}
+			// speed = 30;
+			// print(error);
+			// print('affection ', error * kP + (error - last_error) * kD);
+			this.setSpeed(	speed * this.sign(enc) - error * kP, 
+							speed * this.sign(enc) + error * kP);
+			last_error = error;
+			// wait(10);
 		}
 		var st = Date.now();
-		while (Date.now() - st < 250){
+		while (Date.now() - st < 100){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
 			this.setSpeed((tL - eL) * 5, (tR - eR) * 5);
@@ -52,8 +93,6 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 	this.turnDegrees = function(degrees){
 		var const_enc = this.sm2cpr(this.track_sm * Math.PI * (degrees / 360));
 		var direction = this.sign(const_enc);
-		// print(const_enc);
-		// print(direction);
 		this.target_encoders['left'] += const_enc;
 		this.target_encoders['right'] -= const_enc;
 
@@ -66,7 +105,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			this.setSpeed(80 * direction, -80 * direction);
 		}
 		var st = Date.now();
-		while (Date.now() - st < 500){
+		while (Date.now() - st < 200){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
 			this.setSpeed((this.target_encoders['left'] - eL) * 1.4, (this.target_encoders['right'] - eR) * 1.4);
@@ -90,17 +129,38 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var eL = this.encoderLeft.read();
 		var eR = this.encoderRight.read();
 		
+		var speed = 0;
+		var l = 0;
+		var acceleration_start = 0.05;
+		var acceleration_end = 0.93;
+
 		while ((this.target_encoders['left'] > eL && direction == 1) || (this.target_encoders['right'] > eR && direction == -1)){
 			eL = this.encoderLeft.read();
 			eR = this.encoderRight.read();
 			if (direction == 1){
-				this.setSpeed(70, 0);
+				l = const_enc - this.target_encoders['left'] + eL;
+				if (l < const_enc * acceleration_start){
+					speed = this.getSpeedSmooth(l, const_enc, 30, 100);
+				} else if (l > const_enc * acceleration_end){
+					speed = this.getSpeedSmooth(l, const_enc, 100, 10);
+				} else {
+					speed = 100;
+				}
+				this.setSpeed(speed, 0);
 			} else {
-				this.setSpeed(0, 70);
+				l = const_enc - this.target_encoders['right'] + eR;
+				if (l < const_enc * acceleration_start){
+					speed = this.getSpeedSmooth(l, const_enc, 30, 100);
+				} else if (l > const_enc * acceleration_end){
+					speed = this.getSpeedSmooth(l, const_enc, 100, 10);
+				} else {
+					speed = 100;
+				}
+				this.setSpeed(0, speed);
 			}
 		}
 		var st = Date.now();
-		while (Date.now() - st < 400){
+		while (Date.now() - st < 400 && false){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
 			this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
@@ -145,7 +205,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			last_error = error;
 		}			
 	};
-	this.driveSector = function(){
+	this.driveSector2 = function(){
 		// var const_enc = 750; // encoders to reach next cell
 		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
 		var speed = 40;
@@ -240,6 +300,125 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		// smartPrint(output);
 		return output;
 	};
+	this.driveSector = function(){
+		// var const_enc = 750; // encoders to reach next cell
+
+		// 4 secs with speed 40, end encoder is 716
+		// 2.6 secs with speed 70, and errors after are -7 and -4
+
+		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
+		var speed = 5;
+		var map = [-1, -1, 1, -1]; // contains available movements in this cell, direction is regarding local start direction
+		/*
+			map descriptor:
+				1 - way available
+				-1 - no way
+		*/
+		var teL = this.target_encoders['left'] + const_enc;
+		var teR = this.target_encoders['right'] + const_enc;
+
+		this.target_encoders['left'] += const_enc;
+		this.target_encoders['right'] += const_enc;
+
+		var surface_color = [undefined, undefined, undefined, undefined, undefined];
+		var surface_history = [[],[],[],[],[]];
+
+		var ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
+		var lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
+
+		for (var i = 0; i < 5; i++){
+			var sens = this.sensors[i]()
+			surface_color[i] = sens < 50 ? 1 : -1;
+			surface_history[i].push([surface_color[i], Math.round(ll)]);
+		}
+
+		var flr = false; // true - if we are passing round turn
+		var output = {'direction' : 0, 'map' : map, 'movement' : undefined};
+
+		var start_acc = 0.05;
+		var end_acc = 0.9;
+
+		while (ll < const_enc || lr < const_enc){
+			for (var i = 0; i < 5; i++){
+				var sens = this.sensors[i]();
+				if (((sens < 50 && surface_color[i] == -1) || (sens > 50 && surface_color[i] == 1)) && ll < 650){
+					surface_color[i] *= -1;
+					surface_history[i].push([surface_color[i], Math.round(ll)]);
+					if (i == 2 && ll > 100 && ll < 300) flr = true;
+					else if (i != 2 && flr == true){
+						var enc_less = floor(this.sm2cpr(this.track_sm / 2));
+						// smartPrint(surface_history);
+						this.target_encoders['left'] = teL - enc_less;
+						this.target_encoders['right'] = teR - enc_less; // this.encoderRight.read();
+						print(this.target_encoders['left'] - this.encoderLeft.read());
+						var st = Date.now();
+						while (Date.now() - st < 1300){
+							var eL = this.encoderLeft.read();
+							var eR = this.encoderRight.read();
+							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
+						}
+						this.setSpeed(0, 0);
+						// print(this.target_encoders['left'] - this.encoderLeft.read());
+						// wait(3000);
+						// this.target_encoders['left'] = this.encoderLeft.read();
+						// this.target_encoders['right'] = this.encoderRight.read();
+						// this.moveEncoders(teL - enc_less - this.encoderLeft.read());
+						// throw "END";
+						if (i == 1){						// we detected left turn
+							output['movement'] = 'FL';
+							output['direction'] = -1;
+							output['map'] = [1, -1, -1, 1];
+							robot.turnDegreesOneWheel(-90);
+						} else if (i == 3){					// we detected right turn
+							output['movement'] = 'FR';
+							output['direction'] = 1;
+							output['map'] = [1, 1, -1, -1];
+							robot.turnDegreesOneWheel(90);
+						}						
+						robot.moveEncoders(-enc_less);
+						// smartPrint(output);
+						return output;
+					}
+				}
+			}
+			ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
+			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
+			if (ll + lr < const_enc * start_acc * 2){
+				speed = this.getSpeedSmooth(ll, const_enc * start_acc, 5, 100);	
+			} else if (ll + lr > const_enc * end_acc * 2){
+				speed = this.getSpeedSmooth(ll - const_enc * end_acc, const_enc - const_enc * end_acc, 100, 10);
+			} else {
+				speed = 100;
+			}
+			this.setSpeed(speed - (ll - lr) * 3, speed + (ll - lr) * 3);
+		}
+		var eL = this.encoderLeft.read();
+		var eR = this.encoderRight.read();
+		print('error left after ', teL - eL);
+		print('error right after is ', teR - eR);
+		var st = Date.now();
+		while (Date.now() - st < 150){
+			var eL = this.encoderLeft.read();
+			var eR = this.encoderRight.read();
+			this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
+		}
+		this.setSpeed(0, 0);
+		// smartPrint(surface_history);
+		output['direction'] = 0;
+		output['movement'] = 'F';
+		var end_surface = surface_history[0][surface_history[0].length - 1][0];
+		if (end_surface != surface_history[2][surface_history[2].length - 1][0]){
+			output['map'][0] = 1;
+		}
+		if (surface_history[0].length > 2){
+			output['map'][3] = 1;
+		}
+		if (surface_history[4].length > 2){
+			output['map'][1] = 1;
+		}
+		// smartPrint(output);
+		return output;
+	}
 	this.getCellMap = function(){											// returns array with 4 elements: 1 - way exists, -1 - no way
 		var map = [];
 		var surface = this.sensors[0]() < 50 ? 1 : -1;	// surface color: 1 - white, -1 - black
@@ -464,8 +643,13 @@ var round = Math.round;
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
-	field.localization();
 
+	// robot.moveEncoders(-2000);
+
+	field.localization();
+	// robot.driveSector();
+	// robot.turnDegreesOneWheel(90);
+	// robot.turnDegreesOneWheel(-	90);
 	return;
 
 	// robot.turnDegrees(90);
