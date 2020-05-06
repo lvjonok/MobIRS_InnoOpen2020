@@ -378,12 +378,6 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
 						}
 						this.setSpeed(0, 0);
-						// print(this.target_encoders['left'] - this.encoderLeft.read());
-						// wait(3000);
-						// this.target_encoders['left'] = this.encoderLeft.read();
-						// this.target_encoders['right'] = this.encoderRight.read();
-						// this.moveEncoders(teL - enc_less - this.encoderLeft.read());
-						// throw "END";
 						if (i == 1){						// we detected left turn
 							output['movement'] = 'FL';
 							output['direction'] = -1;
@@ -414,13 +408,13 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 				speed = 100;
 			}
 			cam = this.camera.read()[0];
-			print(cam * 0.3); 
+			// print(cam * 0.3); 
 			this.setSpeed(speed - (ll - lr) * 3 + cam * 0.6, speed + (ll - lr) * 3 - cam * 0.6);
 		}
 		var eL = this.encoderLeft.read();
 		var eR = this.encoderRight.read();
-		print('error left after ', teL - eL);
-		print('error right after is ', teR - eR);
+		//print('error left after ', teL - eL);
+		//print('error right after is ', teR - eR);
 		var st = Date.now();
 		while (Date.now() - st < 150){
 			var eL = this.encoderLeft.read();
@@ -428,7 +422,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
 		}
 		this.setSpeed(0, 0);
-		smartPrint(surface_history);
+		//smartPrint(surface_history);
 		output['direction'] = 0;
 		output['movement'] = 'F';
 		var end_surface = surface_history[0][surface_history[0].length - 1][0];
@@ -477,7 +471,7 @@ Field = function(robot){
 		if (direction < 0) direction += 4;
 		if (direction > 3) direction -= 4;
 		return direction;
-	}
+	};
 	this.getNextVertex = function(cur_v, dir, width, height){					// returns next vertex in custom map
 		switch (dir){
 			case 0:
@@ -516,8 +510,10 @@ Field = function(robot){
 	this.getVertexFromCoor = function(x, y, width, height){						// converts coordinates to vertex
 		return y * width + x;
 	};
-	this.getCoorsFromVertex = function(vertex){									// converts vertex to coordinates
-		return [vertex - floor(vertex / 6) * 6, floor(vertex / 6)]
+	this.getCoorsFromVertex = function(vertex, width, height){									// converts vertex to coordinates
+		if (!width) width = 6;
+		if (!height) height = 6;
+		return [vertex - floor(vertex / width) * height, floor(vertex / width)]
 	};
 	this.localization = function(){												// localizes robot in map
 		var self = this;
@@ -525,6 +521,8 @@ Field = function(robot){
 		max_x = min_x;
 		min_y = this.localization_y;
 		max_y = min_y;
+
+		var avs = {}; // dictionary: key - vertex, value - available vertices
 
 		var cv_directions = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]];
 
@@ -550,77 +548,173 @@ Field = function(robot){
 		};
 		function moveRobot(cur_v, last_v){
 			if (cur_v != last_v){
-				// print('moving from ', cur_v, ' ', last_v);
-				turn = self.getTurn(self.direction, self.localization_map[cur_v].indexOf(last_v));
-				switch (turn){
-					case 0:
-						out = self.robot.driveSector();
-					break;
-					case 1:
-						self.direction += 1;
-						self.robot.turnDegrees(90);
-						out = self.robot.driveSector();
-					break;
-					case -1:
-						self.direction -= 1;
-						self.robot.turnDegrees(-90);
-						out = self.robot.driveSector();
-					break;
-					case 2:
-						self.direction += 2;
-						self.robot.turnDegrees(180);
-						out = self.robot.driveSector();
-						
-					break;
+				if (self.localization_map[cur_v].indexOf(last_v) != -1){
+					print('in1')
+					turn = self.getTurn(self.direction, self.localization_map[cur_v].indexOf(last_v));
+					print('in2')
+					switch (turn){
+						case 0:
+							out = self.robot.driveSector();
+						break;
+						case 1:
+							self.direction += 1;
+							self.robot.turnDegrees(90);
+							out = self.robot.driveSector();
+						break;
+						case -1:
+							self.direction -= 1;
+							self.robot.turnDegrees(-90);
+							out = self.robot.driveSector();
+						break;
+						case 2:
+							self.direction += 2;
+							self.robot.turnDegrees(180);
+							out = self.robot.driveSector();	
+						break;
+					}
+					self.direction = self.adjustDirection(self.direction);
+					changeCoors(self.direction);
+					self.direction += out['direction'];
+					self.direction = self.adjustDirection(self.direction);
+					return out;
 				}
-				self.direction = self.adjustDirection(self.direction);
-				changeCoors(self.direction);
-				self.direction += out['direction'];
-				self.direction = self.adjustDirection(self.direction);
-				return out;
 			}
 			return false;
+		};
+		function updateCoors(vertex){
+			coors = self.getCoorsFromVertex(vertex, 20, 20);
+			min_x = min(min_x, coors[0]);
+			max_x = max(max_x, coors[0]);
+			min_y = min(min_y, coors[1]);
+			max_y = max(max_y, coors[1]);
+			self.localization_x = coors[0];
+			self.localization_y = coors[1];
 		};
 
 		var current_vertex = this.getVertexFromCoor(this.localization_x, this.localization_y, this.localization_width, this.localization_height);
 		var last_vertex = current_vertex;
 
 		var visited = [current_vertex];
-		var queue = [current_vertex];
+		var stack = [current_vertex];
 
 		while (max_x - min_x < 5 || max_y - min_y < 5){
-			current_vertex = queue[queue.length - 1];
+			current_vertex = stack[stack.length - 1];
+			// print('iteration');
+			// print('will move from ', last_vertex, ' to ', current_vertex);
+			// print(stack);
+			print('minmax');
+			print(min_x, ' ', max_x, ' ', min_y, ' ', max_y);
+			// bw();
 			var moved = moveRobot(last_vertex, current_vertex);
-			print(max_x, ' ', min_x, ' ', max_y, ' ', min_y);
-			// print(queue);
+			
 			// print('moved');
 			// smartPrint(moved);
 			if (moved){
 				// we can take map after moving
-				var cell_map = moved['map'];
-			} else {
+				cell_map = moved['map'];
+			} else if (this.localization_x == 10 && this.localization_y == 10) {
 				// we should turn around and read map
 				// print('kek');
-				var cell_map = this.robot.getCellMap();
+				cell_map = this.robot.getCellMap();
 			}
 			visited.push(current_vertex);
-			// print('current map ', cell_map);
+			print('current map ', cell_map);
 			var av_v = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
+			var local_avs = [];
+			var local_vis = [];
+			var added = false;
 			for (var j = 0; j < av_v.length; j++){
-				if ( visited.indexOf(av_v[j]) == -1 ){
+				if ( visited.indexOf(av_v[j]) == -1 && !added){
 					// print('adding ', av_v[j]);
-					queue.push(av_v[j]);
-					break;
+					stack.push(av_v[j]);
+					added = true;
+				} else if (visited.indexOf(av_v[j]) == -1){
+					// print('already visited ', av_v[j]);
+					local_avs.push(av_v[j]);
+				} else if (av_v[j] != last_vertex){
+					// print('it is last vertex ', av_v[j]);
+					local_vis.push(av_v[j]);
 				}
 			}
-			if (queue[queue.length - 1] == current_vertex){
-				from = queue.pop();
+			avs[current_vertex] = copyObj(local_avs);
+			if (stack[stack.length - 1] == current_vertex){
+				for (var i = stack.length - 1; i >= 0; i--){
+					if (avs[stack[i]].length > 0) {
+						// print('i have chosen ', stack[i]);
+						// print('stack before' ,stack);
+						j = stack.length - 1;
+						while (stack[j] != stack[i]){
+							stack.pop();
+							j--;
+						}
+						// print('stack after' ,stack);
+						// print('searching for path between ', current_vertex, ' and ', stack[i]);
+						// print('path is ',this.BFS(this.localization_map, current_vertex, stack[i]));
+						// bw();
+						cell_map = this.moveFromV1ToV2(this.localization_map, current_vertex, stack[i], this.direction);
+						current_vertex = stack[i];
+						updateCoors(current_vertex);
+						// bw();
+						break;
+						// throw "GOT IT";
+					}
+					from = stack.pop();
+				}
 			}
 			// bw();
 
 			last_vertex = current_vertex;
 		}
 
+	};
+	this.BFS = function(map, start_vertex, end_vertex){
+		var current_vertex = start_vertex;
+		var queue = [current_vertex];
+		var visited = [current_vertex];
+		var from = {};
+		print('i started to search for path')
+		while (queue.length > 0){
+			current_vertex = queue.shift();
+			visited.push(current_vertex);
+			if (current_vertex == end_vertex) break;
+			for (var d = 0; d < 4; d++){
+				if (map[current_vertex][d] != -1 && visited.indexOf(map[current_vertex][d]) == -1){
+					queue.push(map[current_vertex][d]);
+					from[map[current_vertex][d]] = current_vertex;
+					print('add queue');
+					smartPrint(from);
+					print(map[current_vertex][d], ' ', current_vertex);
+				}
+			}
+		}
+		print('i reached end vertex');
+		smartPrint(from);
+		var path = [end_vertex];
+		read_vertex = from[end_vertex];
+		print(read_vertex);
+		while (read_vertex != start_vertex){
+			path.push(read_vertex)
+			print(read_vertex);
+			read_vertex = from[read_vertex];
+			print(path);
+		}
+		path.push(start_vertex);
+		print('i got path')
+		return path.reverse();
+	};
+	this.moveFromV1ToV2 = function(map, start_vertex, end_vertex, current_direction){
+		var path = this.BFS(map, start_vertex, end_vertex);
+		for (var i = 0; i < path.length - 1; i++){
+			var cur_v = path[i];
+			var next_v = path[i+1];
+			var needed_direction = map[cur_v].indexOf(next_v);
+			var turn = this.getTurn(current_direction, needed_direction);
+			this.robot.turnDegrees(turn * 90);
+			out = this.robot.driveSector();
+			current_direction = this.adjustDirection(needed_direction + out['direction']);
+		}
+		this.direction = current_direction;
+		return out['map'];
 	};
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
 		var turn_array = [[0,1,2,-1],[-1,0,1,2],[2,-1,0,1],[1,2,-1,0]];
@@ -633,7 +727,7 @@ Field = function(robot){
 		for (var c_d_raw = direction; c_d_raw < direction + 4; c_d_raw++){
 			var c_d = c_d_raw > 3 ? c_d_raw - 4 : c_d_raw;
 			var r_d = c_d + 2;
-			print(c_d, ' ', local_map[l_i]);
+			// print(c_d, ' ', local_map[l_i]);
 			r_d = r_d > 3 ? r_d - 4 : r_d;
 			next_vertex = map[vertex][	c_d];
 			if (local_map[l_i] == -1){		
@@ -648,7 +742,7 @@ Field = function(robot){
 			}
 			l_i += 1;
 		}
-		print('candidates for adding ', available_vertices);
+		// print('candidates for adding ', available_vertices);
 		// bw();
 		return available_vertices;
 	};
@@ -656,6 +750,9 @@ Field = function(robot){
 	this.generateMap(this.localization_map, 20, 20);
 };
 
+var copyObj = function(obj){
+	return JSON.parse(JSON.stringify(obj));
+};
 var bw = function(){
 	brick.playTone(2000, 300);
 	while (!brick.keys().wasPressed(KeysEnum.Up)) { script.wait(100)}
