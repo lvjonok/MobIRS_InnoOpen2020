@@ -1,1 +1,1 @@
-include('D://programs//IRS_projects//MobIRS_InnoOpen2020//video_check.js')
+include('D://programs//IRS_projects//MobIRS_InnoOpen2020//main.js')
