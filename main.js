@@ -534,7 +534,6 @@ Field = function(robot){
 			for (var direction = 0; direction < 4; direction++){
 				map[vertex].push(this.getNextVertex(vertex, direction, width, height));
 			}
-			// print(vertex, " ", map[vertex]);
 		}
 	};
 	this.getVertexFromCoor = function(x, y, width, height){						// converts coordinates to vertex
@@ -551,6 +550,8 @@ Field = function(robot){
 		max_x = min_x;
 		min_y = this.localization_y;
 		max_y = min_y;
+		var firstCell_b = true;
+		var loc_start_vertex = 210;
 
 		var avs = {}; // dictionary: key - vertex, value - available vertices
 
@@ -625,24 +626,25 @@ Field = function(robot){
 		var visited = [current_vertex];
 		var stack = [current_vertex];
 
-		while (max_x - min_x < 5 || max_y - min_y < 5){
+		while (stack.length > 0){	// (max_x - min_x < 5 || max_y - min_y < 5){
 			current_vertex = stack[stack.length - 1];
-			// print('iteration');
-			// print('will move from ', last_vertex, ' to ', current_vertex);
-			// print(stack);
+			keys__ = Object.keys(avs);
+			for (var jj = 0; jj < keys__.length; jj++){
+				remove(avs[keys__[jj]], current_vertex);
+			}
+			print('iteration');
+			print('will move from ', last_vertex, ' to ', current_vertex);
+			print(stack);
 			print('minmax');
 			print(min_x, ' ', max_x, ' ', min_y, ' ', max_y);
 			// bw();
 			var moved = moveRobot(last_vertex, current_vertex);
-			
-			// print('moved');
-			// smartPrint(moved);
 			if (moved){
 				// we can take map after moving
 				cell_map = moved['map'];
-			} else if (this.localization_x == 10 && this.localization_y == 10) {
+			} else if (this.localization_x == 10 && this.localization_y == 10 && firstCell_b) {
+				firstCell_b = false;
 				// we should turn around and read map
-				// print('kek');
 				cell_map = this.robot.getCellMap();
 			}
 			visited.push(current_vertex);
@@ -666,34 +668,44 @@ Field = function(robot){
 			}
 			avs[current_vertex] = copyObj(local_avs);
 			if (stack[stack.length - 1] == current_vertex){
+				if (current_vertex == loc_start_vertex){
+					break;
+				}
+				var found_vertex_with_unvisited_vertices = false;
 				for (var i = stack.length - 1; i >= 0; i--){
-					if (avs[stack[i]].length > 0) {
-						// print('i have chosen ', stack[i]);
-						// print('stack before' ,stack);
-						j = stack.length - 1;
-						while (stack[j] != stack[i]){
-							stack.pop();
-							j--;
-						}
-						// print('stack after' ,stack);
-						// print('searching for path between ', current_vertex, ' and ', stack[i]);
-						// print('path is ',this.BFS(this.localization_map, current_vertex, stack[i]));
-						// bw();
-						cell_map = this.moveFromV1ToV2(this.localization_map, current_vertex, stack[i], this.direction);
-						current_vertex = stack[i];
-						updateCoors(current_vertex);
-						// bw();
+					if (avs[stack[i]].length > 0 || stack[i] == loc_start_vertex) {
+						found_vertex_with_unvisited_vertices = true;
 						break;
-						// throw "GOT IT";
 					}
+				}
+				if (found_vertex_with_unvisited_vertices){
+					for (var i = stack.length - 1; i >= 0; i--){
+						if (avs[stack[i]].length > 0 || stack[i] == loc_start_vertex) {
+							print('i have chosen ', stack[i]);
+							print('stack before' ,stack);
+							j = stack.length - 1;
+							while (stack[j] != stack[i]){
+								stack.pop();
+								j--;
+							}
+							print('stack after' ,stack);
+							print('searching for path between ', current_vertex, ' and ', stack[i]);
+							print('path is ',this.BFS(this.localization_map, current_vertex, stack[i]));
+							// bw();
+							cell_map = this.moveFromV1ToV2_knownMap(this.localization_map, current_vertex, stack[i], this.direction);
+							current_vertex = stack[i];
+							updateCoors(current_vertex);
+							// bw();
+							break;
+							// throw "GOT IT";
+						}
+					}
+				} else {
 					from = stack.pop();
 				}
 			}
-			// bw();
-
 			last_vertex = current_vertex;
 		}
-
 	};
 	this.BFS = function(map, start_vertex, end_vertex){
 		var current_vertex = start_vertex;
@@ -730,7 +742,7 @@ Field = function(robot){
 		// print('i got path')
 		return path.reverse();
 	};
-	this.moveFromV1ToV2 = function(map, start_vertex, end_vertex, current_direction){
+	this.moveFromV1ToV2_knownMap = function(map, start_vertex, end_vertex, current_direction){
 		var path = this.BFS(map, start_vertex, end_vertex);
 		for (var i = 0; i < path.length - 1; i++){
 			var cur_v = path[i];
@@ -744,6 +756,9 @@ Field = function(robot){
 		this.direction = current_direction;
 		return out['map'];
 	};
+	this.moveFromV1ToV2_unknownMap = function(map, start_vertex, end_vertex, current_direction){
+
+	}
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
 		var turn_array = [[0,1,2,-1],[-1,0,1,2],[2,-1,0,1],[1,2,-1,0]];
 		return turn_array[s_d][e_d];
@@ -799,6 +814,9 @@ var count = function(arr, value){
 		if (arr[k] == value) c+=1;
 	}
 	return c;
+};
+var remove = function(arr, value){
+	for( var i = 0; i < arr.length; i++){ if ( arr[i] === value) { arr.splice(i, 1); i--; }}
 }
 
 var main = function(){
