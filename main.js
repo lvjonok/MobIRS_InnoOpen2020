@@ -519,12 +519,17 @@ Field = function(robot){
 	this.width = 6;								// real map x width
 	this.x = -1;								// real robot x coordinate
 	this.y = -1;								// real robot y coordinate
+	this.robot_vertex = -1;						// real robot current vertex
 	this.direction = 1;							// real robot direction
 	this.localization_map = [];					// virtual map
 	this.localization_height = 20;				// virtual map y height
 	this.localization_width = 20;				// virtual map x width
 	this.localization_x = 10;					// virtual robot x coordinate
 	this.localization_y = 10;					// virtual robot y coordinate
+	this.start_x = -1;
+	this.start_y = -1;
+	this.base_x = -1;
+	this.base_y = -1;
 	this.adjustDirection = function(direction){
 		if (direction < 0) direction += 4;
 		if (direction > 3) direction -= 4;
@@ -748,6 +753,10 @@ Field = function(robot){
 		}
 		// smartPrint(this.map);
 		// print('now you are here: ', this.x , ' ', this.y);
+		this.start_x = 10 - min_x;
+		this.start_y = 10 - min_y;
+		this.base_x = this.start_y;
+		this.base_y = this.start_x;
 	};
 	this.BFS = function(map, start_vertex, end_vertex){
 		var current_vertex = start_vertex;
@@ -846,6 +855,10 @@ Field = function(robot){
 		// bw();
 		return available_vertices;
 	};
+	this.CompleteTask = function(){
+		this.localization();
+		this.moveFromV1ToV2_unknownMap(this.map, this.getVertexFromCoor(this.x, this.y, 6, 6), this.getVertexFromCoor(this.base_x, this.base_y, 6, 6), this.direction);
+	};
 	this.generateMap(this.map, 6, 6);
 	this.generateMap(this.localization_map, 20, 20);
 };
@@ -874,13 +887,12 @@ var count = function(arr, value){
 };
 var remove = function(arr, value){
 	for( var i = 0; i < arr.length; i++){ if ( arr[i] === value) { arr.splice(i, 1); i--; }}
-}
+};
 
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
-	field.localization();
-	field.moveFromV1ToV2_unknownMap(field.map, 0, 10, field.direction);
+	field.CompleteTask();
 	return;
 };
 main();
