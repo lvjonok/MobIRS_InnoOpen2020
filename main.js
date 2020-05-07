@@ -372,7 +372,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 						this.target_encoders['right'] = teR - enc_less; // this.encoderRight.read();
 						print(this.target_encoders['left'] - this.encoderLeft.read());
 						var st = Date.now();
-						while (Date.now() - st < 1300){
+						while (Date.now() - st < 1000){
 							var eL = this.encoderLeft.read();
 							var eR = this.encoderRight.read();
 							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
