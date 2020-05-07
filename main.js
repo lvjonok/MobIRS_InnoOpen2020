@@ -180,7 +180,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			}
 		}
 		var st = Date.now();
-		while (Date.now() - st < 400 && false){
+		while (Date.now() - st < 50){
 			var eL = this.encoderLeft.read();
 			var eR = this.encoderRight.read();
 			this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
@@ -321,18 +321,13 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		return output;
 	};
 	this.driveSector = function(){
-		// var const_enc = 750; // encoders to reach next cell
-
-		// 4 secs with speed 40, end encoder is 716
-		// 2.6 secs with speed 70, and errors after are -7 and -4
-		// this.resetEncoders();
 		var const_enc = (52.5 * (2 / 3) / (this.wheelD_sm * Math.PI) * 360);
 		var speed = 5;
 		var map = [-1, -1, 1, -1]; // contains available movements in this cell, direction is regarding local start direction
 		/*
 			map descriptor:
-				1 - way available
-				-1 - no way
+				1	 - 	way available
+				-1	 - 	no way
 		*/
 		var teL = this.target_encoders['left'] + const_enc;
 		var teR = this.target_encoders['right'] + const_enc;
@@ -343,21 +338,20 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var surface_color = [undefined, undefined, undefined, undefined, undefined];
 		var surface_history = [[],[],[],[],[]];
 
-		var ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read(); //  this.encoderLeft.read() - seL;
+		var ll = const_enc - this.target_encoders['left'] + this.encoderLeft.read();
 		var lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 
 		for (var i = 0; i < 5; i++){
 			var sens = this.sensors[i]()
-			surface_color[i] = sens < 50 ? 1 : -1;
+			surface_color[i] = sens < 50 ? 1 : -1;							// 1 - white surface, -1 - black surface
 			surface_history[i].push([surface_color[i], Math.round(ll)]);
 		}
 
 		var flr = false; // true - if we are passing round turn
-		var output = {'direction' : 0, 'map' : map, 'movement' : undefined};
+		var output = {'direction' : 0, 'map' : map, 'movement' : undefined, 'sector type' : 0};
 
 		var start_acc = 0.05;
 		var end_acc = 0.9;
-		// print('bef all')
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
@@ -369,8 +363,8 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 						var enc_less = floor(this.sm2cpr(this.track_sm / 2));
 						// smartPrint(surface_history);
 						this.target_encoders['left'] = teL - enc_less;
-						this.target_encoders['right'] = teR - enc_less; // this.encoderRight.read();
-						print(this.target_encoders['left'] - this.encoderLeft.read());
+						this.target_encoders['right'] = teR - enc_less;
+						// print(this.target_encoders['left'] - this.encoderLeft.read());
 						var st = Date.now();
 						while (Date.now() - st < 1000){
 							var eL = this.encoderLeft.read();
@@ -378,21 +372,20 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 							this.setSpeed((this.target_encoders['left'] - eL) * 6, (this.target_encoders['right'] - eR) * 6);
 						}
 						this.setSpeed(0, 0);
-						if (i == 1){						// we detected left turn
+						if (i == 1){								// we detected left turn
 							output['movement'] = 'FL';
 							output['direction'] = -1;
 							output['map'] = [1, -1, -1, 1];
+							output['sector type'] = 4;
 							robot.turnDegreesOneWheel(-90);
-						} else if (i == 3){					// we detected right turn
+						} else if (i == 3){							// we detected right turn
 							output['movement'] = 'FR';
 							output['direction'] = 1;
 							output['map'] = [1, 1, -1, -1];
+							output['sector type'] = 4;
 							robot.turnDegreesOneWheel(90);
 						}
-						// print('bef -enc less')
 						robot.moveEncoders(-enc_less);
-						// print('after -enc')
-						// smartPrint(output);
 						return output;
 					}
 				}
@@ -408,13 +401,10 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 				speed = 100;
 			}
 			cam = this.camera.read()[0];
-			// print(cam * 0.3); 
 			this.setSpeed(speed - (ll - lr) * 3 + cam * 0.6, speed + (ll - lr) * 3 - cam * 0.6);
 		}
 		var eL = this.encoderLeft.read();
 		var eR = this.encoderRight.read();
-		//print('error left after ', teL - eL);
-		//print('error right after is ', teR - eR);
 		var st = Date.now();
 		while (Date.now() - st < 150){
 			var eL = this.encoderLeft.read();
@@ -422,7 +412,6 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
 		}
 		this.setSpeed(0, 0);
-		//smartPrint(surface_history);
 		output['direction'] = 0;
 		output['movement'] = 'F';
 		var end_surface = surface_history[0][surface_history[0].length - 1][0];
@@ -435,7 +424,48 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		if (surface_history[4].length > 2){
 			output['map'][1] = 1;
 		}
-		// smartPrint(output);
+		/*
+			sector types:
+				0 - blank
+				1 - straight line 						white
+				2 - 90 degrees corner 					white
+				3 - deadend 							white
+				4 - 90 degrees round corner				white
+				5 - T-type intersection					white
+				6 - X-type intersection					white
+				-1 - straight line						black
+				-2 - 90 degrees corner					black
+				-3 - deadend							black
+				-5 - T-type intersection				black
+				-6 - X-type intersection				black
+		*/
+		var lines_count = count(output['map'], 1);
+		switch (lines_count){
+			case 0:
+				throw "it should not happen";
+			break;
+			case 1:
+				// one line available means that it is a deadend
+				output['sector type'] = 3 * end_surface;
+			break;
+			case 2:
+				// it could be straight line or 90 degrees corner
+				if (output['map'][0] == output['map'][2]){
+					output['sector type'] = 1 * end_surface;
+				} else {
+					output['sector type'] = 2 * end_surface;
+				}
+			break;
+			case 3:
+				// T - type intersection
+				output['sector type'] = 5 * end_surface;
+			break;
+			case 4:
+				// X - type intersection
+				output['sector type'] = 6 * end_surface;
+			break;
+		}
+		print('this cell was ', output['sector type']);
 		return output;
 	}
 	this.getCellMap = function(){											// returns array with 4 elements: 1 - way exists, -1 - no way
@@ -549,9 +579,7 @@ Field = function(robot){
 		function moveRobot(cur_v, last_v){
 			if (cur_v != last_v){
 				if (self.localization_map[cur_v].indexOf(last_v) != -1){
-					print('in1')
 					turn = self.getTurn(self.direction, self.localization_map[cur_v].indexOf(last_v));
-					print('in2')
 					switch (turn){
 						case 0:
 							out = self.robot.driveSector();
@@ -672,7 +700,7 @@ Field = function(robot){
 		var queue = [current_vertex];
 		var visited = [current_vertex];
 		var from = {};
-		print('i started to search for path')
+		// print('i started to search for path')
 		while (queue.length > 0){
 			current_vertex = queue.shift();
 			visited.push(current_vertex);
@@ -681,25 +709,25 @@ Field = function(robot){
 				if (map[current_vertex][d] != -1 && visited.indexOf(map[current_vertex][d]) == -1){
 					queue.push(map[current_vertex][d]);
 					from[map[current_vertex][d]] = current_vertex;
-					print('add queue');
-					smartPrint(from);
-					print(map[current_vertex][d], ' ', current_vertex);
+					// print('add queue');
+					// smartPrint(from);
+					// print(map[current_vertex][d], ' ', current_vertex);
 				}
 			}
 		}
-		print('i reached end vertex');
-		smartPrint(from);
+		// print('i reached end vertex');
+		// smartPrint(from);
 		var path = [end_vertex];
 		read_vertex = from[end_vertex];
 		print(read_vertex);
 		while (read_vertex != start_vertex){
 			path.push(read_vertex)
-			print(read_vertex);
+			// print(read_vertex);
 			read_vertex = from[read_vertex];
-			print(path);
+			// print(path);
 		}
 		path.push(start_vertex);
-		print('i got path')
+		// print('i got path')
 		return path.reverse();
 	};
 	this.moveFromV1ToV2 = function(map, start_vertex, end_vertex, current_direction){
@@ -765,6 +793,13 @@ var min = Math.min;
 var floor = Math.floor;
 var ceil = Math.ceil;
 var round = Math.round;
+var count = function(arr, value){
+	var c = 0;
+	for (var k = 0; k < arr.length; k++){
+		if (arr[k] == value) c+=1;
+	}
+	return c;
+}
 
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
