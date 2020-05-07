@@ -654,7 +654,7 @@ Field = function(robot){
 		var visited = [current_vertex];
 		var stack = [current_vertex];
 
-		while (stack.length > 0){	// (max_x - min_x < 5 || max_y - min_y < 5){
+		while (max_x - min_x < 5 || max_y - min_y < 5){ // (stack.length > 0){	// 
 			current_vertex = stack[stack.length - 1];
 			keys__ = Object.keys(avs);
 			for (var jj = 0; jj < keys__.length; jj++){
@@ -722,7 +722,32 @@ Field = function(robot){
 			}
 			last_vertex = current_vertex;
 		}
-		smartPrint(this.localization_map);
+		this.x = this.localization_x - min_x;
+		this.y = this.localization_y - min_y;
+		var real_x = 0;
+		var real_y = 0;
+		for (var virtual_y = min_y; virtual_y <= max_y; virtual_y++){
+			real_x = 0;
+			for (var virtual_x = min_x; virtual_x <= max_x; virtual_x++){
+				var virtual_vertex = this.getVertexFromCoor(virtual_x, virtual_y, 20, 20);
+				var real_vertex = this.getVertexFromCoor(real_x, real_y, 6, 6);
+				var old_map = this.localization_map[virtual_vertex]['adjacency'];
+				var new_map = [];
+				for (var d = 0; d < 4; d++){
+					if (old_map[d] != -1){
+						new_map.push(this.getNextVertex(real_vertex, d, 6, 6));
+					} else {
+						new_map.push(-1);
+					}					
+				}
+				this.map[real_vertex]['adjacency'] = new_map;
+				this.map[real_vertex]['type'] = this.localization_map[virtual_vertex]['type'];
+				real_x++;
+			}
+			real_y++;
+		}
+		// smartPrint(this.map);
+		// print('now you are here: ', this.x , ' ', this.y);
 	};
 	this.BFS = function(map, start_vertex, end_vertex){
 		var current_vertex = start_vertex;
@@ -767,7 +792,29 @@ Field = function(robot){
 		return out;
 	};
 	this.moveFromV1ToV2_unknownMap = function(map, start_vertex, end_vertex, current_direction){
-
+		var current_vertex = start_vertex;
+		while (current_vertex != end_vertex){
+			var path = this.BFS(map, current_vertex, end_vertex);
+			for (var i = 0; i < path.length - 1; i++){
+				var cur_v = path[i];
+				var next_v = path[i+1];
+				var needed_direction = map[cur_v]['adjacency'].indexOf(next_v);
+				var turn = this.getTurn(current_direction, needed_direction);
+				this.robot.turnDegrees(turn * 90);
+				out = this.robot.driveSector();
+				current_direction = this.adjustDirection(needed_direction + out['direction']);
+				cell_map = out['map'];
+				cell_type = out['sector type'];
+				this.updateVertexAdjacency(current_vertex, this.direction, map, cell_map);
+				current_vertex = next_v;
+				break;
+			}
+			this.direction = current_direction;
+		}
+		
+		// print('returned');
+		smartPrint(out);
+		return out;
 	};
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
 		var turn_array = [[0,1,2,-1],[-1,0,1,2],[2,-1,0,1],[1,2,-1,0]];
@@ -832,44 +879,8 @@ var remove = function(arr, value){
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
-
-	// robot.moveEncoders(1000);
-	// robot.turnDegrees(-90);
-	// robot.moveEncoders(1000);
-	// robot.turnDegrees(-90);
-	// robot.moveEncoders(1000);
-	// robot.turnDegrees(-90);
-	// robot.moveEncoders(1000);
-	// robot.turnDegrees(-90);
-
-
-	// robot.turnLine(90);
-	// robot.driveSector();
 	field.localization();
-	// robot.driveSector();
-	// robot.turnDegreesOneWheel(90);
-	// robot.turnDegreesOneWheel(-	90);
+	field.moveFromV1ToV2_unknownMap(field.map, 0, 10, field.direction);
 	return;
-
-	// robot.turnDegrees(90);
-	robot.driveSector();
-	
-	robot.turnDegrees(90);
-	robot.driveSector();
-	robot.turnDegrees(-90);
-	robot.driveSector();
-	robot.driveSector();
-	robot.driveSector();
-	robot.turnDegrees(-90);
-	robot.driveSector();
-	robot.driveSector();
-	robot.driveSector();
-	robot.driveSector();
-	robot.driveSector();
-	robot.turnDegrees(90);
-	robot.driveSector();
-	robot.turnDegrees(-90);
-	robot.driveSector();
-	robot.turnDegrees(-90);
 };
 main();
