@@ -468,7 +468,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		print('this cell was ', output['sector type']);
 		return output;
 	}
-	this.getCellMap = function(){											// returns array with 4 elements: 1 - way exists, -1 - no way
+	this.getCellMap = function(){							// returns array with 4 elements: 1 - way exists, -1 - no way and cell type
 		var map = [];
 		var surface = this.sensors[0]() < 50 ? 1 : -1;	// surface color: 1 - white, -1 - black
 		for (var i = 0; i < 4; i++){
@@ -480,7 +480,35 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			}
 			robot.turnDegrees(90);
 		}
-		return map;
+		var lines_count = count(map, 1);
+		var sector_type = 0;
+		end_surface = surface;
+		switch (lines_count){
+			case 0:
+				throw "it should not happen";
+			break;
+			case 1:
+				// one line available means that it is a deadend
+				sector_type = 3 * end_surface;
+			break;
+			case 2:
+				// it could be straight line or 90 degrees corner
+				if (map[0] == map[2]){
+					sector_type = 1 * end_surface;
+				} else {
+					sector_type = 2 * end_surface;
+				}
+			break;
+			case 3:
+				// T - type intersection
+				sector_type = 5 * end_surface;
+			break;
+			case 4:
+				// X - type intersection
+				sector_type = 6 * end_surface;
+			break;
+		}
+		return {'map': map, 'sector type': sector_type};
 	};
 };
 
@@ -551,9 +579,9 @@ Field = function(robot){
 		min_y = this.localization_y;
 		max_y = min_y;
 		var firstCell_b = true;
-		var loc_start_vertex = 210;
 
-		var avs = {}; // dictionary: key - vertex, value - available vertices
+		var avs = {}; // map: key - vertex, value - available vertices
+		var cell_types = {}; // map: key - vertex, value - cell type
 
 		var cv_directions = [[0, 1, 2, 3], [1, 2, 3, 0], [2, 3, 0, 1], [3, 0, 1, 2]];
 
@@ -621,6 +649,7 @@ Field = function(robot){
 		};
 
 		var current_vertex = this.getVertexFromCoor(this.localization_x, this.localization_y, this.localization_width, this.localization_height);
+		var loc_start_vertex = current_vertex;
 		var last_vertex = current_vertex;
 
 		var visited = [current_vertex];
@@ -632,11 +661,11 @@ Field = function(robot){
 			for (var jj = 0; jj < keys__.length; jj++){
 				remove(avs[keys__[jj]], current_vertex);
 			}
-			print('iteration');
-			print('will move from ', last_vertex, ' to ', current_vertex);
-			print(stack);
-			print('minmax');
-			print(min_x, ' ', max_x, ' ', min_y, ' ', max_y);
+			// print('iteration');
+			// print('will move from ', last_vertex, ' to ', current_vertex);
+			// print(stack);
+			// print('minmax');
+			// print(min_x, ' ', max_x, ' ', min_y, ' ', max_y);
 			// bw();
 			var moved = moveRobot(last_vertex, current_vertex);
 			if (moved){
@@ -645,10 +674,14 @@ Field = function(robot){
 			} else if (this.localization_x == 10 && this.localization_y == 10 && firstCell_b) {
 				firstCell_b = false;
 				// we should turn around and read map
-				cell_map = this.robot.getCellMap();
+				moved = this.robot.getCellMap();
+				cell_map = moved['map'];
+				// smartPrint(moved);
 			}
+			cell_types[current_vertex] = moved['sector type'];
+			// smartPrint(cell_types);
+			// bw();
 			visited.push(current_vertex);
-			print('current map ', cell_map);
 			var av_v = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
 			var local_avs = [];
 			var local_vis = [];
@@ -706,13 +739,13 @@ Field = function(robot){
 			}
 			last_vertex = current_vertex;
 		}
+		smartPrint(cell_types);
 	};
 	this.BFS = function(map, start_vertex, end_vertex){
 		var current_vertex = start_vertex;
 		var queue = [current_vertex];
 		var visited = [current_vertex];
 		var from = {};
-		// print('i started to search for path')
 		while (queue.length > 0){
 			current_vertex = queue.shift();
 			visited.push(current_vertex);
@@ -721,25 +754,17 @@ Field = function(robot){
 				if (map[current_vertex][d] != -1 && visited.indexOf(map[current_vertex][d]) == -1){
 					queue.push(map[current_vertex][d]);
 					from[map[current_vertex][d]] = current_vertex;
-					// print('add queue');
-					// smartPrint(from);
-					// print(map[current_vertex][d], ' ', current_vertex);
 				}
 			}
 		}
-		// print('i reached end vertex');
-		// smartPrint(from);
 		var path = [end_vertex];
 		read_vertex = from[end_vertex];
 		print(read_vertex);
 		while (read_vertex != start_vertex){
 			path.push(read_vertex)
-			// print(read_vertex);
 			read_vertex = from[read_vertex];
-			// print(path);
 		}
 		path.push(start_vertex);
-		// print('i got path')
 		return path.reverse();
 	};
 	this.moveFromV1ToV2_knownMap = function(map, start_vertex, end_vertex, current_direction){
@@ -758,7 +783,7 @@ Field = function(robot){
 	};
 	this.moveFromV1ToV2_unknownMap = function(map, start_vertex, end_vertex, current_direction){
 
-	}
+	};
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
 		var turn_array = [[0,1,2,-1],[-1,0,1,2],[2,-1,0,1],[1,2,-1,0]];
 		return turn_array[s_d][e_d];
