@@ -116,9 +116,9 @@
         </regions>
     </world>
     <robots>
-        <robot id="trikKitRobot" position="-50.0412:226.822" direction="364.223">
+        <robot id="trikKitRobot" position="150.431:-175.969" direction="719.972">
             <sensors>
-                <sensor port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor" position="19.2963:24.7037" direction="0"/>
+                <sensor port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor" position="21.3535:26.0388" direction="0"/>
                 <sensor port="A5###input###А5###sensorA5" type="trik::robotModel::parts::TrikLightSensor" position="44:24" direction="0"/>
                 <sensor port="A6###input###А6###sensorA6" type="" position="0:0" direction="0"/>
                 <sensor port="A1###input###А1###sensorA1" type="trik::robotModel::parts::TrikLightSensor" position="44:13" direction="0"/>
