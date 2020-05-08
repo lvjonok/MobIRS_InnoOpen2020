@@ -105,7 +105,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		
 		var l = abs(this.target_encoders['left'] - eL);
 		var acceleration_start = 0.05;
-		var acceleration_end = 0.8;
+		var acceleration_end = 0.9; // 0.8
 
 		var speed = 20;
 
@@ -351,7 +351,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var output = {'direction' : 0, 'map' : map, 'movement' : undefined, 'sector type' : 0};
 
 		var start_acc = 0.05;
-		var end_acc = 0.9;
+		var end_acc = 0.95;
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
@@ -467,7 +467,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		}
 		// print('this cell was ', output['sector type']);
 		return output;
-	}
+	};
 	this.getCellMap = function(){							// returns array with 4 elements: 1 - way exists, -1 - no way and cell type
 		var map = [];
 		var surface = this.sensors[0]() < 50 ? 1 : -1;	// surface color: 1 - white, -1 - black
@@ -509,6 +509,16 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			break;
 		}
 		return {'map': map, 'sector type': sector_type};
+	};
+	this.printBase = function(){
+		brick.display().clear();
+		brick.display().addLabel('BASE', 1, 1);
+		brick.display().redraw();
+	};
+	this.printPoint = function(){
+		brick.display().clear();
+		brick.display().addLabel('POINT', 1, 1);
+		brick.display().redraw();
 	};
 };
 
@@ -793,6 +803,15 @@ Field = function(robot){
 			var turn = this.getTurn(current_direction, needed_direction);
 			this.robot.turnDegrees(turn * 90);
 			out = this.robot.driveSector();
+			if (map == this.localization_map){
+				coors = this.getCoorsFromVertex(next_v, 20, 20);
+				this.localization_x = coors[0];
+				this.localization_y = coors[1];
+			} else {
+				coors = this.getCoorsFromVertex(next_v, 6, 6);
+				this.x = coors[0];
+				this.y = coors[1];
+			}
 			current_direction = this.adjustDirection(needed_direction + out['direction']);
 		}
 		this.direction = current_direction;
@@ -814,15 +833,24 @@ Field = function(robot){
 				current_direction = this.adjustDirection(needed_direction + out['direction']);
 				cell_map = out['map'];
 				cell_type = out['sector type'];
-				this.updateVertexAdjacency(current_vertex, this.direction, map, cell_map);
 				current_vertex = next_v;
+				this.updateVertexAdjacency(current_vertex, this.direction, map, cell_map);
+				map[current_vertex]['type'] = cell_type;
+				
+				if (map == this.localization_map){
+					coors = this.getCoorsFromVertex(next_v, 20, 20);
+					this.localization_x = coors[0];
+					this.localization_y = coors[1];
+				} else {
+					coors = this.getCoorsFromVertex(next_v, 6, 6);
+					this.x = coors[0];
+					this.y = coors[1];
+				}
 				break;
 			}
 			this.direction = current_direction;
 		}
-		
-		// print('returned');
-		smartPrint(out);
+		// smartPrint(out);
 		return out;
 	};
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
@@ -855,9 +883,56 @@ Field = function(robot){
 		// bw();
 		return available_vertices;
 	};
+	this.getPointCandidates = function(){
+		var point_min_x = max(this.base_x - 2, 0);
+		var point_max_x = min(this.base_x + 2, 5);
+		var point_min_y = max(this.base_y - 2, 0);
+		var point_max_y = min(this.base_y + 2, 5);
+		candidates = [];
+		for (var y = point_min_y; y <= point_max_y; y++){
+			for (var x = point_min_x; x <= point_max_x; x++){
+				vertex = this.getVertexFromCoor(x, y, 6, 6);
+				if (abs(this.map[vertex]['type']) == 5 || abs(this.map[vertex]['type']) == 6){
+					print('added ', x, ' ', y);
+					candidates.push({'vertex': vertex, 'area': this.getPointArea(x, y)});
+				} else {
+					print('discarded ', x, ' ', y, ' cause its type is ', this.map[vertex]['type']);
+				}
+			}
+		}
+		smartPrint(candidates);
+	};
+	this.getPointArea = function(x, y){
+		var point_min_x = max(this.base_x - 2, 0);
+		var point_max_x = min(this.base_x + 2, 5);
+		var point_min_y = max(this.base_y - 2, 0);
+		var point_max_y = min(this.base_y + 2, 5);
+		var area = 0;
+		if (x == point_min_x && x != 0){
+			area += 3;
+			if (y == 0 || y == 5) area -= 1;
+		}
+		if (x == point_max_x && x != 5){
+			area += 3;
+			if (y == 0 || y == 5) area -= 1;
+		}
+		if (y == point_min_y && y != 0){
+			area += 3;
+			if (x == 0 || x == 5) area -= 1;
+		}
+		if (y == point_max_y && y != 5){
+			area += 3;
+			if (x == 0 || x == 5) area -= 1;
+		}
+		if (area == 6) area -= 1;
+		return area;
+	};
 	this.CompleteTask = function(){
 		this.localization();
 		this.moveFromV1ToV2_unknownMap(this.map, this.getVertexFromCoor(this.x, this.y, 6, 6), this.getVertexFromCoor(this.base_x, this.base_y, 6, 6), this.direction);
+		this.robot.printBase();
+		// wait(5000);
+		this.getPointCandidates();
 	};
 	this.generateMap(this.map, 6, 6);
 	this.generateMap(this.localization_map, 20, 20);
