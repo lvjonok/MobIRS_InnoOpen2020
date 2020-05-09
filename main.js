@@ -674,6 +674,8 @@ Field = function(robot){
 		var visited = [current_vertex];
 		var stack = [current_vertex];
 
+		var changedPriority = false;
+
 		while (max_x - min_x < 5 || max_y - min_y < 5){ // (stack.length > 0){	// 
 			current_vertex = stack[stack.length - 1];
 			keys__ = Object.keys(avs);
@@ -690,27 +692,66 @@ Field = function(robot){
 			cell_map = moved['map'];
 			this.localization_map[current_vertex]['type'] = moved['sector type'];
 			visited.push(current_vertex);
-			// print(cell_map);
-			// smartPrint(this.localization_map[current_vertex]);
+			var av_d = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
+			// print(current_vertex, ' ' , av_d);
+			var av_v = [];
+			
+
+			if (max_x - min_x == 5 || max_y - min_y == 5){
+				
+				if (!changedPriority) print('changed priority');
+				changedPriority = true;
+				// we have this priority: left -> up -> down -> right || 3 -> 0 -> 2 -> 1
+				if (av_d.indexOf(3) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][3]);
+				}
+				if (av_d.indexOf(0) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][0]);
+				}
+				if (av_d.indexOf(2) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][2]);
+				}
+				if (av_d.indexOf(1) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][1]);
+				}
+			} else {
+				// we have this priority: right -> down -> up -> left || 1 -> 2 -> 0 -> 3
+				if (av_d.indexOf(1) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][1]);
+				}
+				if (av_d.indexOf(2) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][2]);
+				}
+				if (av_d.indexOf(0) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][0]);
+				}
+				if (av_d.indexOf(3) != -1){
+					av_v.push(this.localization_map[current_vertex]['adjacency'][3]);
+				}
+				
+			}
+
+			
+			
 			// bw();
-			var av_v = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
 			var local_avs = [];
 			var local_vis = [];
 			var added = false;
 			for (var j = 0; j < av_v.length; j++){
-				if ( visited.indexOf(av_v[j]) == -1 && !added){
+				if ( visited.indexOf(av_v[j]) == -1 && !added){		// add first available cell and add to stack
 					// print('adding ', av_v[j]);
 					stack.push(av_v[j]);
 					added = true;
-				} else if (visited.indexOf(av_v[j]) == -1){
+				} else if (visited.indexOf(av_v[j]) == -1){			// add available cells
 					// print('already visited ', av_v[j]);
 					local_avs.push(av_v[j]);
-				} else if (av_v[j] != last_vertex){
+				} else if (av_v[j] != last_vertex){					// add already visited cells close to current
 					// print('it is last vertex ', av_v[j]);
 					local_vis.push(av_v[j]);
 				}
 			}
 			avs[current_vertex] = copyObj(local_avs);
+			// if (stack[stack.length - 1] == current_vertex) from = stack.pop();
 			if (stack[stack.length - 1] == current_vertex){
 				if (current_vertex == loc_start_vertex){
 					break;
@@ -780,6 +821,7 @@ Field = function(robot){
 		var from = {};
 		while (queue.length > 0){
 			current_vertex = queue.shift();
+			print(current_vertex);
 			visited.push(current_vertex);
 			if (current_vertex == end_vertex) break;
 			for (var d = 0; d < 4; d++){
@@ -830,7 +872,7 @@ Field = function(robot){
 		var current_vertex = start_vertex;
 		while (current_vertex != end_vertex){
 			var path = this.BFS(map, current_vertex, end_vertex);
-			// print('iteration path ' , path);
+			print('iteration path ' , path);
 			for (var i = 0; i < path.length - 1; i++){
 				var cur_v = path[i];
 				var next_v = path[i+1];
@@ -884,14 +926,13 @@ Field = function(robot){
 				map[vertex]['adjacency'][c_d] = -1;
 			} else {
 				if (l_i != 2 || true){
-					available_vertices.push(next_vertex);
+					available_vertices.push(c_d);
 					// print('added av ', c_d, ' ', next_vertex);
 				}
 			}
 			l_i += 1;
 		}
 		// print('candidates for adding ', available_vertices);
-		// bw();
 		return available_vertices;
 	};
 	this.getPointCandidates = function(){
@@ -1008,7 +1049,8 @@ var remove = function(arr, value){
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
-	field.CompleteTask();
+	field.localization();
+	// field.CompleteTask();
 	return;
 };
 main();
