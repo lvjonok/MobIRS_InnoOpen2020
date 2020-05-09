@@ -104,8 +104,8 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var eR = this.encoderRight.read();
 		
 		var l = abs(this.target_encoders['left'] - eL);
-		var acceleration_start = 0.05;
-		var acceleration_end = 0.9; // 0.8
+		var acceleration_start = 0.02;
+		var acceleration_end = 0.97; // 0.8
 
 		var speed = 20;
 
@@ -151,8 +151,8 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		
 		var speed = 0;
 		var l = 0;
-		var acceleration_start = 0.05;
-		var acceleration_end = 0.93;
+		var acceleration_start = 0.02;
+		var acceleration_end = 0.97;
 
 		while ((this.target_encoders['left'] > eL && direction == 1) || (this.target_encoders['right'] > eR && direction == -1)){
 			eL = this.encoderLeft.read();
@@ -350,8 +350,8 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		var flr = false; // true - if we are passing round turn
 		var output = {'direction' : 0, 'map' : map, 'movement' : undefined, 'sector type' : 0};
 
-		var start_acc = 0.05;
-		var end_acc = 0.95;
+		var start_acc = 0.03;
+		var end_acc = 0.97;
 		while (ll < const_enc || lr < const_enc){
 			for (var i = 0; i < 5; i++){
 				var sens = this.sensors[i]();
@@ -394,7 +394,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 			if (ll < const_enc * start_acc){
 				ll = max(1, ll);
-				speed = this.getSpeedSmooth(ll, const_enc * start_acc, 5, 100);	
+				speed = this.getSpeedSmooth(ll, const_enc * start_acc, 10, 100);	
 			} else if (ll > const_enc * end_acc){
 				speed = this.getSpeedSmooth(ll - const_enc * end_acc, const_enc - const_enc * end_acc, 100, 10);
 			} else {
