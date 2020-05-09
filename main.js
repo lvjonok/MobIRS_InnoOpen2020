@@ -520,6 +520,11 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 		brick.display().addLabel('POINT', 1, 1);
 		brick.display().redraw();
 	};
+	this.printFinish = function(){
+		brick.display().clear();
+		brick.display().addLabel('FINISH', 1, 1);
+		brick.display().redraw();
+	};
 };
 
 Field = function(robot){
@@ -786,7 +791,7 @@ Field = function(robot){
 		}
 		var path = [end_vertex];
 		read_vertex = from[end_vertex];
-		print(read_vertex);
+		// print(read_vertex);
 		while (read_vertex != start_vertex){
 			path.push(read_vertex)
 			read_vertex = from[read_vertex];
@@ -800,6 +805,7 @@ Field = function(robot){
 			var cur_v = path[i];
 			var next_v = path[i+1];
 			var needed_direction = map[cur_v]['adjacency'].indexOf(next_v);
+			this.vertex = next_v;
 			var turn = this.getTurn(current_direction, needed_direction);
 			this.robot.turnDegrees(turn * 90);
 			out = this.robot.driveSector();
@@ -816,13 +822,15 @@ Field = function(robot){
 		}
 		this.direction = current_direction;
 		// print('returned');
-		smartPrint(out);
+		// smartPrint(out);
+		this.vertex = end_vertex;
 		return out;
 	};
 	this.moveFromV1ToV2_unknownMap = function(map, start_vertex, end_vertex, current_direction){
 		var current_vertex = start_vertex;
 		while (current_vertex != end_vertex){
 			var path = this.BFS(map, current_vertex, end_vertex);
+			// print('iteration path ' , path);
 			for (var i = 0; i < path.length - 1; i++){
 				var cur_v = path[i];
 				var next_v = path[i+1];
@@ -831,10 +839,13 @@ Field = function(robot){
 				this.robot.turnDegrees(turn * 90);
 				out = this.robot.driveSector();
 				current_direction = this.adjustDirection(needed_direction + out['direction']);
+				this.direction = current_direction;
 				cell_map = out['map'];
 				cell_type = out['sector type'];
 				current_vertex = next_v;
+				// print('verex ', current_vertex, ' map is ', cell_map);
 				this.updateVertexAdjacency(current_vertex, this.direction, map, cell_map);
+				this.vertex = current_vertex;
 				map[current_vertex]['type'] = cell_type;
 				
 				if (map == this.localization_map){
@@ -850,7 +861,7 @@ Field = function(robot){
 			}
 			this.direction = current_direction;
 		}
-		// smartPrint(out);
+		this.vertex = end_vertex;
 		return out;
 	};
 	this.getTurn = function(s_d, e_d){											// returns turn from one to another direction	
@@ -888,18 +899,21 @@ Field = function(robot){
 		var point_max_x = min(this.base_x + 2, 5);
 		var point_min_y = max(this.base_y - 2, 0);
 		var point_max_y = min(this.base_y + 2, 5);
-		candidates = [];
+		var candidates = [];
+		var unknown_cells = [];
 		for (var y = point_min_y; y <= point_max_y; y++){
 			for (var x = point_min_x; x <= point_max_x; x++){
 				vertex = this.getVertexFromCoor(x, y, 6, 6);
 				if (abs(this.map[vertex]['type']) == 5 || abs(this.map[vertex]['type']) == 6){
 					print('added ', x, ' ', y);
 					candidates.push({'vertex': vertex, 'area': this.getPointArea(x, y)});
-				} else {
-					print('discarded ', x, ' ', y, ' cause its type is ', this.map[vertex]['type']);
+				} else if (this.map[vertex]['type'] == -1){
+					unknown_cells.push(vertex);
+					print('discarded ', x, ' ', y, ' cause its type is unknown ');
 				}
 			}
 		}
+		this.access_point_candidates = copyObj(candidates);
 		smartPrint(candidates);
 	};
 	this.getPointArea = function(x, y){
@@ -927,12 +941,39 @@ Field = function(robot){
 		if (area == 6) area -= 1;
 		return area;
 	};
+	this.moveToAccessPoint = function(){
+		var max_area = -1;
+		var max_ei = -1;
+		for (var e_i = 0; e_i < this.access_point_candidates.length; e_i++){
+			if (this.access_point_candidates[e_i]['area'] > max_area){
+				max_area = this.access_point_candidates[e_i]['area'];
+				max_ei = e_i;
+			}
+		}
+		if (max_area == 5){
+			print('move from ', this.vertex, ' ', this.access_point_candidates[max_ei]['vertex']);
+			this.moveFromV1ToV2_unknownMap(this.map, this.vertex, this.access_point_candidates[max_ei]['vertex'], this.direction);
+		} else {
+			throw "We should search more and maybe check any others";
+		}
+	};
 	this.CompleteTask = function(){
 		this.localization();
 		this.moveFromV1ToV2_unknownMap(this.map, this.getVertexFromCoor(this.x, this.y, 6, 6), this.getVertexFromCoor(this.base_x, this.base_y, 6, 6), this.direction);
+		this.robot.moveEncoders(-200);
 		this.robot.printBase();
-		// wait(5000);
+		wait(5000);
+		this.robot.moveEncoders(200);
 		this.getPointCandidates();
+		this.moveToAccessPoint();
+		this.robot.moveEncoders(-200);
+		this.robot.printPoint();
+		wait(5000);
+		this.robot.moveEncoders(200);
+		this.moveFromV1ToV2_unknownMap(this.map, this.getVertexFromCoor(this.x, this.y, 6, 6), this.getVertexFromCoor(this.start_x, this.start_y, 6, 6), this.direction);
+		this.robot.moveEncoders(-200);
+		this.robot.printFinish();
+		wait(5000);
 	};
 	this.generateMap(this.map, 6, 6);
 	this.generateMap(this.localization_map, 20, 20);
