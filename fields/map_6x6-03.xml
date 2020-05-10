@@ -1,137 +1,143 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root version="20190819">
     <world>
+        <walls/>
+        <skittles/>
+        <balls/>
         <colorFields>
-            <rectangle begin="0:-300" end="100:-200" stroke="#ff000000" fill="#ff000000" stroke-style="solid" fill-style="solid" id="inverse1" stroke-width="1"/>            <rectangle begin="0:0" end="100:100" stroke="#ff000000" fill="#ff000000" stroke-style="solid" fill-style="solid" id="inverse2" stroke-width="1"/>            <rectangle begin="-100:-200" end="0:-100" stroke="#ff000000" fill="#ff000000" stroke-style="solid" fill-style="solid" id="inverse3" stroke-width="1"/>            <line begin="-250:-250" end="-204:-250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="1"/>
-            <line begin="-250:-250" end="-250:-204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="2"/>
-            <line begin="-150:-250" end="-150:-204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="3"/>
-            <line begin="-150:-250" end="-196:-250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="4"/>
-            <line begin="-50:-250" end="-4:-250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="5"/>
-            <line begin="-50:-250" end="-50:-204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="6"/>
-            <cubicBezier begin="150:-202" cp1="150:-227" cp2="127:-250" end="102:-250" stroke-style="solid" fill="#ffffffff" fill-style="none" stroke="#ff000000" stroke-width="9" id="9"/>
-            <line begin="-250:-150" end="-250:-196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="10"/>
-            <line begin="-250:-150" end="-204:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="11"/>
-            <line begin="-250:-150" end="-250:-104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="12"/>
-            <line begin="-150:-150" end="-150:-196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="13"/>
-            <line begin="-150:-150" end="-104:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="14"/>
-            <line begin="-150:-150" end="-196:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="15"/>
-            <line begin="50:-150" end="96:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="19"/>
-            <line begin="50:-150" end="50:-104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="20"/>
-            <line begin="50:-150" end="4:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="21"/>
-            <line begin="150:-150" end="150:-196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="22"/>
-            <line begin="150:-150" end="196:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="23"/>
-            <line begin="150:-150" end="150:-104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="24"/>
-            <line begin="150:-150" end="104:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="25"/>
-            <line begin="250:-150" end="250:-104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="26"/>
-            <line begin="250:-150" end="204:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="27"/>
-            <line begin="-250:-50" end="-250:-96" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="28"/>
-            <line begin="-250:-50" end="-204:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="29"/>
-            <line begin="-150:-50" end="-104:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="30"/>
-            <line begin="-150:-50" end="-150:-4" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="31"/>
-            <line begin="-150:-50" end="-196:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="32"/>
-            <line begin="-50:-50" end="-4:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="33"/>
-            <line begin="-50:-50" end="-96:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="34"/>
-            <line begin="50:-50" end="50:-96" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="35"/>
-            <line begin="50:-50" end="96:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="36"/>
-            <line begin="50:-50" end="50:-4" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="37"/>
-            <line begin="50:-50" end="4:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="38"/>
-            <line begin="150:-50" end="150:-96" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="39"/>
-            <line begin="150:-50" end="196:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="40"/>
-            <line begin="150:-50" end="104:-50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="41"/>
-            <cubicBezier begin="250:-98" cp1="250:-72" cp2="227:-50" end="202:-50" stroke-style="solid" fill="#ffffffff" fill-style="none" stroke="#ff000000" stroke-width="9" id="42"/>
-            <line begin="-250:50" end="-204:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="43"/>
-            <line begin="-250:50" end="-250:96" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="44"/>
-            <line begin="-150:50" end="-150:4" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="45"/>
-            <line begin="-150:50" end="-104:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="46"/>
-            <line begin="-150:50" end="-150:96" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="47"/>
-            <line begin="-150:50" end="-196:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="48"/>
-            <cubicBezier begin="-50:98" cp1="-50:72" cp2="-72:50" end="-98:50" stroke-style="solid" fill="#ffffffff" fill-style="none" stroke="#ff000000" stroke-width="9" id="49"/>
-            <line begin="50:50" end="50:4" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="50"/>
-            <line begin="50:50" end="96:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="51"/>
-            <line begin="150:50" end="196:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="52"/>
-            <line begin="150:50" end="104:50" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="53"/>
-            <cubicBezier begin="250:98" cp1="250:72" cp2="227:50" end="202:50" stroke-style="solid" fill="#ffffffff" fill-style="none" stroke="#ff000000" stroke-width="9" id="54"/>
-            <line begin="-250:150" end="-250:104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="55"/>
-            <line begin="-250:150" end="-204:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="56"/>
-            <line begin="-150:150" end="-150:104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="57"/>
-            <line begin="-150:150" end="-104:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="58"/>
-            <line begin="-150:150" end="-196:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="59"/>
-            <line begin="-50:150" end="-50:104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="60"/>
-            <line begin="-50:150" end="-4:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="61"/>
-            <line begin="-50:150" end="-50:196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="62"/>
-            <line begin="-50:150" end="-96:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="63"/>
-            <line begin="50:150" end="50:196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="64"/>
-            <line begin="50:150" end="4:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="65"/>
-            <line begin="150:150" end="196:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="66"/>
-            <line begin="150:150" end="150:196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="67"/>
-            <line begin="250:150" end="250:104" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="68"/>
-            <line begin="250:150" end="250:196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="69"/>
-            <line begin="250:150" end="204:150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="70"/>
-            <line begin="-50:250" end="-50:204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="71"/>
-            <line begin="-50:250" end="-4:250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="72"/>
-            <line begin="50:250" end="50:204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="73"/>
-            <line begin="50:250" end="4:250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="74"/>
-            <line begin="150:250" end="150:204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="75"/>
-            <line begin="150:250" end="196:250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="76"/>
-            <line begin="250:250" end="250:204" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="77"/>
-            <line begin="250:250" end="4:250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ff000000" stroke-width="9" id="78"/>
-            <line begin="50:-250" end="96:-250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="7"/>
-            <line begin="50:-250" end="4:-250" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="8"/>
-            <line begin="-50:-150" end="-50:-196" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="16"/>
-            <line begin="-50:-150" end="-4:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="17"/>
-            <line begin="-50:-150" end="-96:-150" stroke-style="solid" fill="#ffffff00" fill-style="none" stroke="#ffffffff" stroke-width="9" id="18"/>
+            <rectangle fill-style="solid" stroke-width="1" stroke-style="solid" id="inverse1" begin="0:-300" end="100:-200" stroke="#ff000000" fill="#ff000000"/>
+            <rectangle fill-style="solid" stroke-width="1" stroke-style="solid" id="inverse2" begin="0:0" end="100:100" stroke="#ff000000" fill="#ff000000"/>
+            <rectangle fill-style="solid" stroke-width="1" stroke-style="solid" id="inverse3" begin="-100:-200" end="0:-100" stroke="#ff000000" fill="#ff000000"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="1" begin="-250:-250" end="-204:-250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="2" begin="-250:-250" end="-250:-204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="3" begin="-150:-250" end="-150:-204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="4" begin="-150:-250" end="-196:-250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="5" begin="-50:-250" end="-4:-250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="6" begin="-50:-250" end="-50:-204" stroke="#ff000000" fill="#ffffff00"/>
+            <cubicBezier fill-style="none" stroke-width="9" stroke-style="solid" cp2="127:-250" id="9" cp1="150:-227" begin="150:-202" end="102:-250" stroke="#ff000000" fill="#ffffffff"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="10" begin="-250:-150" end="-250:-196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="11" begin="-250:-150" end="-204:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="12" begin="-250:-150" end="-250:-104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="13" begin="-150:-150" end="-150:-196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="14" begin="-150:-150" end="-104:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="15" begin="-150:-150" end="-196:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="19" begin="50:-150" end="96:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="20" begin="50:-150" end="50:-104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="21" begin="50:-150" end="4:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="22" begin="150:-150" end="150:-196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="23" begin="150:-150" end="196:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="24" begin="150:-150" end="150:-104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="25" begin="150:-150" end="104:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="26" begin="250:-150" end="250:-104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="27" begin="250:-150" end="204:-150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="28" begin="-250:-50" end="-250:-96" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="29" begin="-250:-50" end="-204:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="30" begin="-150:-50" end="-104:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="31" begin="-150:-50" end="-150:-4" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="32" begin="-150:-50" end="-196:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="33" begin="-50:-50" end="-4:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="34" begin="-50:-50" end="-96:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="35" begin="50:-50" end="50:-96" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="36" begin="50:-50" end="96:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="37" begin="50:-50" end="50:-4" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="38" begin="50:-50" end="4:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="39" begin="150:-50" end="150:-96" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="40" begin="150:-50" end="196:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="41" begin="150:-50" end="104:-50" stroke="#ff000000" fill="#ffffff00"/>
+            <cubicBezier fill-style="none" stroke-width="9" stroke-style="solid" cp2="227:-50" id="42" cp1="250:-72" begin="250:-98" end="202:-50" stroke="#ff000000" fill="#ffffffff"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="43" begin="-250:50" end="-204:50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="44" begin="-250:50" end="-250:96" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="45" begin="-150:50" end="-150:4" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="46" begin="-150:50" end="-104:50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="47" begin="-150:50" end="-150:96" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="48" begin="-150:50" end="-196:50" stroke="#ff000000" fill="#ffffff00"/>
+            <cubicBezier fill-style="none" stroke-width="9" stroke-style="solid" cp2="-72:50" id="49" cp1="-50:72" begin="-50:98" end="-98:50" stroke="#ff000000" fill="#ffffffff"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="50" begin="50:50" end="50:4" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="51" begin="50:50" end="96:50" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="52" begin="150:50" end="196:50" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="53" begin="150:50" end="104:50" stroke="#ff000000" fill="#ffffff00"/>
+            <cubicBezier fill-style="none" stroke-width="9" stroke-style="solid" cp2="227:50" id="54" cp1="250:72" begin="250:98" end="202:50" stroke="#ff000000" fill="#ffffffff"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="55" begin="-250:150" end="-250:104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="56" begin="-250:150" end="-204:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="57" begin="-150:150" end="-150:104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="58" begin="-150:150" end="-104:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="59" begin="-150:150" end="-196:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="60" begin="-50:150" end="-50:104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="61" begin="-50:150" end="-4:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="62" begin="-50:150" end="-50:196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="63" begin="-50:150" end="-96:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="64" begin="50:150" end="50:196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="65" begin="50:150" end="4:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="66" begin="150:150" end="196:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="67" begin="150:150" end="150:196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="68" begin="250:150" end="250:104" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="69" begin="250:150" end="250:196" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="70" begin="250:150" end="204:150" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="71" begin="-50:250" end="-50:204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="72" begin="-50:250" end="-4:250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="73" begin="50:250" end="50:204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="74" begin="50:250" end="4:250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="75" begin="150:250" end="150:204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="76" begin="150:250" end="196:250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="77" begin="250:250" end="250:204" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="78" begin="250:250" end="4:250" stroke="#ff000000" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="7" begin="50:-250" end="96:-250" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="8" begin="50:-250" end="4:-250" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="16" begin="-50:-150" end="-50:-196" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="17" begin="-50:-150" end="-4:-150" stroke="#ffffffff" fill="#ffffff00"/>
+            <line fill-style="none" stroke-width="9" stroke-style="solid" id="18" begin="-50:-150" end="-96:-150" stroke="#ffffffff" fill="#ffffff00"/>
         </colorFields>
+        <images/>
         <regions>
-            <region x="-300" y="-300" color="#000000" width="600" height="600" filled="false" visible="true" id="polygon" type="rectangle"/>
-            <region x="-300" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids0" type="rectangle"/>
-            <region x="-200" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids1" type="rectangle"/>
-            <region x="-100" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids2" type="rectangle"/>
-            <region x="0" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids3" type="rectangle"/>
-            <region x="100" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids4" type="rectangle"/>
-            <region x="200" y="-300" color="#000000" width="0" height="600" filled="false" visible="true" id="grids5" type="rectangle"/>
-            <region x="-300" y="-300" color="#000000" width="600" height="0" filled="false" visible="true" id="grids6" type="rectangle"/>
-            <region x="-300" y="-200" color="#000000" width="600" height="0" filled="false" visible="true" id="grids7" type="rectangle"/>
-            <region x="-300" y="-100" color="#000000" width="600" height="0" filled="false" visible="true" id="grids8" type="rectangle"/>
-            <region x="-300" y="0" color="#000000" width="600" height="0" filled="false" visible="true" id="grids9" type="rectangle"/>
-            <region x="-300" y="100" color="#000000" width="600" height="0" filled="false" visible="true" id="grids10" type="rectangle"/>
-            <region x="-300" y="200" color="#000000" width="600" height="0" filled="false" visible="true" id="grids11" type="rectangle"/>
-            <region x="-300" y="-200"  visible="true" filled="true" color="#6699ff" id="base_area" width="400" height="500" type="rectangle" text="Зона БС" textX="-1" textY="5"/>
-            <region x="-200" y="0" id="base" color="#000066" width="100" height="100" filled="true" type="rectangle" visible="true" text="Базовая станция" textX="5" textY="5"/>
-            <region x="0" y="-200" filled="true" color="#FF0000" visible="true" id="start_finish" width="100" height="100" type="rectangle" text="Старт/финиш" textX="5" textY="5"/>
-            <!--               Нумерация строк и столбцов                     -->
-            <region x="-300" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x0" type="rectangle" text="0" textX="43" textY="0"/>
-            <region x="-200" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x1" type="rectangle" text="1" textX="43" textY="0"/>
-            <region x="-100" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x2" type="rectangle" text="2" textX="43" textY="0"/>
-            <region x="0" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x3" type="rectangle" text="3" textX="43" textY="0"/>
-            <region x="100" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x4" type="rectangle" text="4" textX="43" textY="0"/>
-            <region x="200" y="-320" color="#000000" width="100" height="20" filled="false" visible="true" id="x5" type="rectangle" text="5" textX="43" textY="0"/>
-            <region x="-320" y="-300" color="#000000" width="20" height="100" filled="false" visible="true" id="y0" type="rectangle" text="0" textX="4" textY="43"/>
-            <region x="-320" y="-200" color="#000000" width="20" height="100" filled="false" visible="true" id="y1" type="rectangle" text="1" textX="4" textY="43"/>
-            <region x="-320" y="-100" color="#000000" width="20" height="100" filled="false" visible="true" id="y2" type="rectangle" text="2" textX="4" textY="43"/>
-            <region x="-320" y="0" color="#000000" width="20" height="100" filled="false" visible="true" id="y3" type="rectangle" text="3" textX="4" textY="43"/>
-            <region x="-320" y="100" color="#000000" width="20" height="100" filled="false" visible="true" id="y4" type="rectangle" text="4" textX="4" textY="43"/>
-            <region x="-320" y="200" color="#000000" width="20" height="100" filled="false" visible="true" id="y5" type="rectangle" text="5" textX="4" textY="43"/>
+            <region height="20" width="100" id="x3" filled="false" visible="true" y="-320" text="3" type="rectangle" textY="0" x="0" textX="43" color="#000000"/>
+            <region height="100" width="20" id="y5" filled="false" visible="true" y="200" text="5" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="20" width="100" id="x2" filled="false" visible="true" y="-320" text="2" type="rectangle" textY="0" x="-100" textX="43" color="#000000"/>
+            <region height="20" width="100" id="x0" filled="false" visible="true" y="-320" text="0" type="rectangle" textY="0" x="-300" textX="43" color="#000000"/>
+            <region height="100" width="100" id="start_finish" filled="true" visible="true" y="-200" text="Старт/финиш" type="rectangle" textY="5" x="0" textX="5" color="#ff0000"/>
+            <region height="20" width="100" id="x1" filled="false" visible="true" y="-320" text="1" type="rectangle" textY="0" x="-200" textX="43" color="#000000"/>
+            <region height="20" width="100" id="x4" filled="false" visible="true" y="-320" text="4" type="rectangle" textY="0" x="100" textX="43" color="#000000"/>
+            <region height="100" width="20" id="y4" filled="false" visible="true" y="100" text="4" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="20" width="100" id="x5" filled="false" visible="true" y="-320" text="5" type="rectangle" textY="0" x="200" textX="43" color="#000000"/>
+            <region height="100" width="20" id="y3" filled="false" visible="true" y="0" text="3" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="100" width="20" id="y1" filled="false" visible="true" y="-200" text="1" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="100" width="20" id="y0" filled="false" visible="true" y="-300" text="0" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="100" width="20" id="y2" filled="false" visible="true" y="-100" text="2" type="rectangle" textY="43" x="-320" textX="4" color="#000000"/>
+            <region height="600" width="600" id="polygon" filled="false" visible="true" y="-300" type="rectangle" x="-300" color="#000000"/>
+            <region height="0" width="600" id="grids10" filled="false" visible="true" y="100" type="rectangle" x="-300" color="#000000"/>
+            <region height="0" width="600" id="grids9" filled="false" visible="true" y="0" type="rectangle" x="-300" color="#000000"/>
+            <region height="600" width="0" id="grids1" filled="false" visible="true" y="-300" type="rectangle" x="-200" color="#000000"/>
+            <region height="500" width="400" id="base_area" filled="true" visible="true" y="-200" text="Зона БС" type="rectangle" textY="5" x="-300" textX="-1" color="#6699ff"/>
+            <region height="100" width="100" id="base" filled="true" visible="true" y="0" text="Базовая станция" type="rectangle" textY="5" x="-200" textX="5" color="#000066"/>
+            <region height="600" width="0" id="grids0" filled="false" visible="true" y="-300" type="rectangle" x="-300" color="#000000"/>
+            <region height="0" width="600" id="grids11" filled="false" visible="true" y="200" type="rectangle" x="-300" color="#000000"/>
+            <region height="0" width="600" id="grids8" filled="false" visible="true" y="-100" type="rectangle" x="-300" color="#000000"/>
+            <region height="0" width="600" id="grids7" filled="false" visible="true" y="-200" type="rectangle" x="-300" color="#000000"/>
+            <region height="600" width="0" id="grids2" filled="false" visible="true" y="-300" type="rectangle" x="-100" color="#000000"/>
+            <region height="0" width="600" id="grids6" filled="false" visible="true" y="-300" type="rectangle" x="-300" color="#000000"/>
+            <region height="600" width="0" id="grids4" filled="false" visible="true" y="-300" type="rectangle" x="100" color="#000000"/>
+            <region height="600" width="0" id="grids3" filled="false" visible="true" y="-300" type="rectangle" x="0" color="#000000"/>
+            <region height="600" width="0" id="grids5" filled="false" visible="true" y="-300" type="rectangle" x="200" color="#000000"/>
         </regions>
-
-    </world><robots>
-        <robot position="50:-175" id="trikKitRobot" direction="0">
+    </world>
+    <robots>
+        <robot position="24.8607:-171.83" id="trikKitRobot" direction="1350.17">
             <sensors>
-                <sensor port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor" position="21.3535:26.0388" direction="0"/>
-                <sensor port="A5###input###А5###sensorA5" type="trik::robotModel::parts::TrikLightSensor" position="44:24" direction="0"/>
-                <sensor port="A6###input###А6###sensorA6" type="" position="0:0" direction="0"/>
-                <sensor port="A1###input###А1###sensorA1" type="trik::robotModel::parts::TrikLightSensor" position="44:13" direction="0"/>
-                <sensor port="A2###input###А2###sensorA2" type="trik::robotModel::parts::TrikLightSensor" position="44:35" direction="0"/>
-                <sensor port="A3###input###А3###sensorA3" type="trik::robotModel::parts::TrikLightSensor" position="44:-5" direction="0"/>
-                <sensor port="A4###input###А4###sensorA4" type="trik::robotModel::parts::TrikLightSensor" position="44:55" direction="0"/>
+                <sensor direction="0" position="44:55" port="A4###input###А4###sensorA4" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:-5" port="A3###input###А3###sensorA3" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:35" port="A2###input###А2###sensorA2" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:13" port="A1###input###А1###sensorA1" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="0:0" port="A6###input###А6###sensorA6" type=""/>
+                <sensor direction="0" position="44:24" port="A5###input###А5###sensorA5" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="27:25" port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor"/>
             </sensors>
-            <startPosition x="75" y="-150" direction="0"/>
-            <wheels right="M3###output###М3###" left="M4###output###М4###"/> 
+            <startPosition id="{877e35e5-ae8a-4cb8-be3b-96c1e6631348}" y="-150" x="75" direction="0"/>
+            <wheels left="M4###output###М4###" right="M3###output###М3###"/>
         </robot>
     </robots>
-    <settings realisticSensors="false" realisticPhysics="false" realisticMotors="false"/>
-        <constraints>
+    <settings realisticMotors="false" realisticPhysics="false" realisticSensors="false"/>
+    <constraints>
         <timelimit value="120000"/>
-        <constraint checkOnce="true" failMessage="Робот должен находиться в красной зоне перед стартом!">
+        <constraint failMessage="Робот должен находиться в красной зоне перед стартом!" checkOnce="true">
             <inside objectId="robot1" regionId="start_finish"/>
         </constraint>
         <constraint failMessage="Робот покинул допустимую зону!">

@@ -116,13 +116,13 @@
     </world><robots>
         <robot position="-150:25" id="trikKitRobot" direction="0">
             <sensors>
-                <sensor port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor" position="21.3535:26.0388" direction="0"/>
-                <sensor port="A5###input###А5###sensorA5" type="trik::robotModel::parts::TrikLightSensor" position="44:24" direction="0"/>
-                <sensor port="A6###input###А6###sensorA6" type="" position="0:0" direction="0"/>
-                <sensor port="A1###input###А1###sensorA1" type="trik::robotModel::parts::TrikLightSensor" position="44:13" direction="0"/>
-                <sensor port="A2###input###А2###sensorA2" type="trik::robotModel::parts::TrikLightSensor" position="44:35" direction="0"/>
-                <sensor port="A3###input###А3###sensorA3" type="trik::robotModel::parts::TrikLightSensor" position="44:-5" direction="0"/>
-                <sensor port="A4###input###А4###sensorA4" type="trik::robotModel::parts::TrikLightSensor" position="44:55" direction="0"/>
+                <sensor direction="0" position="44:55" port="A4###input###А4###sensorA4" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:-5" port="A3###input###А3###sensorA3" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:35" port="A2###input###А2###sensorA2" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="44:13" port="A1###input###А1###sensorA1" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="0:0" port="A6###input###А6###sensorA6" type=""/>
+                <sensor direction="0" position="44:24" port="A5###input###А5###sensorA5" type="trik::robotModel::parts::TrikLightSensor"/>
+                <sensor direction="0" position="27:25" port="LineSensorPort###input###TrikLineSensorPort###lineSensor" type="trik::robotModel::parts::TrikLineSensor"/>
             </sensors>
             <startPosition x="-125" y="50" direction="0"/>
             <wheels right="M3###output###М3###" left="M4###output###М4###"/> 
