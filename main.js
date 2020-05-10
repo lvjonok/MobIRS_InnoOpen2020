@@ -394,7 +394,7 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			lr = const_enc - this.target_encoders['right'] + this.encoderRight.read();
 			if (ll < const_enc * start_acc){
 				ll = max(1, ll);
-				speed = this.getSpeedSmooth(ll, const_enc * start_acc, 10, 100);	
+				speed = this.getSpeedSmooth(ll, const_enc * start_acc, 40, 100);	
 			} else if (ll > const_enc * end_acc){
 				speed = this.getSpeedSmooth(ll - const_enc * end_acc, const_enc - const_enc * end_acc, 100, 10);
 			} else {
@@ -403,15 +403,15 @@ Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSid
 			cam = this.camera.read()[0];
 			this.setSpeed(speed - (ll - lr) * 3 + cam * 0.6, speed + (ll - lr) * 3 - cam * 0.6);
 		}
-		var eL = this.encoderLeft.read();
-		var eR = this.encoderRight.read();
-		var st = Date.now();
-		while (Date.now() - st < 150){
-			var eL = this.encoderLeft.read();
-			var eR = this.encoderRight.read();
-			this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
-		}
-		this.setSpeed(0, 0);
+		// var eL = this.encoderLeft.read();
+		// var eR = this.encoderRight.read();
+		// var st = Date.now();
+		// while (Date.now() - st < 150){
+		// 	var eL = this.encoderLeft.read();
+		// 	var eR = this.encoderRight.read();
+		// 	this.setSpeed((teL - eL) * 6, (teR - eR) * 6);
+		// }
+		// this.setSpeed(0, 0);
 		output['direction'] = 0;
 		output['movement'] = 'F';
 		var end_surface = surface_history[0][surface_history[0].length - 1][0];
@@ -698,7 +698,6 @@ Field = function(robot){
 			
 
 			if (max_x - min_x == 5 || max_y - min_y == 5){
-				
 				if (!changedPriority) print('changed priority');
 				changedPriority = true;
 				// we have this priority: left -> up -> down -> right || 3 -> 0 -> 2 -> 1
@@ -1049,8 +1048,8 @@ var remove = function(arr, value){
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
 	field = new Field(robot);
-	field.localization();
-	// field.CompleteTask();
+	// field.localization();
+	field.CompleteTask();
 	return;
 };
 main();
