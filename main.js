@@ -541,10 +541,13 @@ Field = function(robot){
 	this.localization_width = 20;				// virtual map x width
 	this.localization_x = 10;					// virtual robot x coordinate
 	this.localization_y = 10;					// virtual robot y coordinate
-	this.start_x = -1;
-	this.start_y = -1;
-	this.base_x = -1;
-	this.base_y = -1;
+	this.start_x = -1;							// real robot start x coordinate
+	this.start_y = -1;							// real robot start y coordinate
+	this.base_x = -1;							// base point x coordinate
+	this.base_y = -1;							// base point y coordinate
+	this.access_point_candidates = [];			// contains known vertices with their areas where we can put an access point
+	this.unknown_access_point_candidates = [];	// contains unvisited cells that might have bigger area than known
+	this.access_point_area_goal = 5;			// describes area of point we have chosen, need to make a recursion
 	this.adjustDirection = function(direction){
 		if (direction < 0) direction += 4;
 		if (direction > 3) direction -= 4;
@@ -693,7 +696,6 @@ Field = function(robot){
 			this.localization_map[current_vertex]['type'] = moved['sector type'];
 			visited.push(current_vertex);
 			var av_d = this.updateVertexAdjacency(current_vertex, this.direction, this.localization_map, cell_map);
-			// print(current_vertex, ' ' , av_d);
 			var av_v = [];
 			
 
@@ -726,13 +728,8 @@ Field = function(robot){
 				}
 				if (av_d.indexOf(3) != -1){
 					av_v.push(this.localization_map[current_vertex]['adjacency'][3]);
-				}
-				
+				}	
 			}
-
-			
-			
-			// bw();
 			var local_avs = [];
 			var local_vis = [];
 			var added = false;
@@ -813,14 +810,14 @@ Field = function(robot){
 		this.base_x = this.start_y;
 		this.base_y = this.start_x;
 	};
-	this.BFS = function(map, start_vertex, end_vertex){
+	this.BFS = function(map, start_vertex, end_vertex){							// returns list of vertices from start node to end
 		var current_vertex = start_vertex;
 		var queue = [current_vertex];
 		var visited = [current_vertex];
 		var from = {};
 		while (queue.length > 0){
 			current_vertex = queue.shift();
-			print(current_vertex);
+			// print(current_vertex);
 			visited.push(current_vertex);
 			if (current_vertex == end_vertex) break;
 			for (var d = 0; d < 4; d++){
@@ -871,7 +868,7 @@ Field = function(robot){
 		var current_vertex = start_vertex;
 		while (current_vertex != end_vertex){
 			var path = this.BFS(map, current_vertex, end_vertex);
-			print('iteration path ' , path);
+			// print('iteration path ' , path);
 			for (var i = 0; i < path.length - 1; i++){
 				var cur_v = path[i];
 				var next_v = path[i+1];
@@ -934,29 +931,33 @@ Field = function(robot){
 		// print('candidates for adding ', available_vertices);
 		return available_vertices;
 	};
-	this.getPointCandidates = function(){
+	this.getPointCandidates = function(){										// returns list of available points
 		var point_min_x = max(this.base_x - 2, 0);
 		var point_max_x = min(this.base_x + 2, 5);
 		var point_min_y = max(this.base_y - 2, 0);
 		var point_max_y = min(this.base_y + 2, 5);
 		var candidates = [];
-		var unknown_cells = [];
+		var unknown_cells = {0:[], 1:[], 2:[], 3:[], 4: [], 5:[]};
 		for (var y = point_min_y; y <= point_max_y; y++){
 			for (var x = point_min_x; x <= point_max_x; x++){
 				vertex = this.getVertexFromCoor(x, y, 6, 6);
 				if (abs(this.map[vertex]['type']) == 5 || abs(this.map[vertex]['type']) == 6){
-					print('added ', x, ' ', y);
+					// print('added ', x, ' ', y);
 					candidates.push({'vertex': vertex, 'area': this.getPointArea(x, y)});
-				} else if (this.map[vertex]['type'] == -1){
-					unknown_cells.push(vertex);
-					print('discarded ', x, ' ', y, ' cause its type is unknown ');
+				} else if (this.map[vertex]['type'] == -1 && this.getPointArea(x, y) > 1){
+					// unknown_cells.push({'vertex': vertex, 'area': this.getPointArea(x, y)});
+					unknown_cells[this.getPointArea(x, y)].push(vertex);
+					// print('discarded ', x, ' ', y, ' cause its type is unknown ');
 				}
 			}
 		}
 		this.access_point_candidates = copyObj(candidates);
-		smartPrint(candidates);
+		this.unknown_access_point_candidates = copyObj(unknown_cells);
+		// smartPrint(candidates);
+		smartPrint(unknown_cells);
+		return this.access_point_candidates;
 	};
-	this.getPointArea = function(x, y){
+	this.getPointArea = function(x, y){											// returns area for every point
 		var point_min_x = max(this.base_x - 2, 0);
 		var point_max_x = min(this.base_x + 2, 5);
 		var point_min_y = max(this.base_y - 2, 0);
@@ -981,7 +982,7 @@ Field = function(robot){
 		if (area == 6) area -= 1;
 		return area;
 	};
-	this.moveToAccessPoint = function(){
+	this.moveToAccessPoint = function(){										// moves robot to access point
 		var max_area = -1;
 		var max_ei = -1;
 		for (var e_i = 0; e_i < this.access_point_candidates.length; e_i++){
@@ -990,14 +991,31 @@ Field = function(robot){
 				max_ei = e_i;
 			}
 		}
-		if (max_area == 5){
+		print('\n\n\n\n\n\n\n');
+		smartPrint(this.unknown_access_point_candidates);
+		print('---------------------------------------');
+		smartPrint(this.access_point_candidates);
+		print('---------------------------------------');
+		print('goal is ',this.access_point_area_goal);
+		// bw();
+
+		if (max_area == this.access_point_area_goal){
 			print('move from ', this.vertex, ' ', this.access_point_candidates[max_ei]['vertex']);
 			this.moveFromV1ToV2_unknownMap(this.map, this.vertex, this.access_point_candidates[max_ei]['vertex'], this.direction);
+			print('we got it');
+			return true;
 		} else {
-			throw "We should search more and maybe check any others";
+			while (this.unknown_access_point_candidates[this.access_point_area_goal].length == 0) {this.access_point_area_goal--;}
+			print('rec ', this.access_point_area_goal);
+			current_goal = this.unknown_access_point_candidates[this.access_point_area_goal].pop();
+			this.moveFromV1ToV2_unknownMap(this.map, this.vertex, current_goal, this.direction);
+			this.getPointCandidates();
+			this.moveToAccessPoint();
+			print('first layer');
+			// throw "We should search more and maybe check any others";
 		}
 	};
-	this.CompleteTask = function(){
+	this.CompleteTask = function(){												// completes basic task
 		this.localization();
 		this.moveFromV1ToV2_unknownMap(this.map, this.getVertexFromCoor(this.x, this.y, 6, 6), this.getVertexFromCoor(this.base_x, this.base_y, 6, 6), this.direction);
 		this.robot.moveEncoders(-200);
