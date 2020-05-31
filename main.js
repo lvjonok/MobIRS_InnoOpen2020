@@ -1,4 +1,4 @@
-Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSideSensor, rightSideSensor, middleLineSensor){
+	Robot = function(leftMotor, rightMotor, leftLineSensor, rightLineSensor, leftSideSensor, rightSideSensor, middleLineSensor){
 	this.motorLeft = brick.motor(leftMotor);								// robot's left motor object
 	this.motorRight = brick.motor(rightMotor);								// robot's right motor object
 	this.encoderLeft = brick.encoder("E" + leftMotor[1]);					// robot's left encoder object
@@ -1062,6 +1062,8 @@ var count = function(arr, value){
 var remove = function(arr, value){
 	for( var i = 0; i < arr.length; i++){ if ( arr[i] === value) { arr.splice(i, 1); i--; }}
 };
+
+
 
 var main = function(){
 	robot = new Robot("M4", "M3", "A1", "A2", "A3", "A4", "A5");
